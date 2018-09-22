@@ -1,6 +1,6 @@
 body {
   margin: 0;
-  padding: 30;
+  padding: 30px;
   font-family: sans-serif;
 }
 
@@ -36,4 +36,8 @@ body {
   to {
     transform: rotate(360deg);
   }
+}
+
+.form {
+  padding-top: 200px;
 }
