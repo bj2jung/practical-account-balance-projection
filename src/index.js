@@ -2,6 +2,12 @@ import React, { Component } from "react";
 import ReactDOM from "react-dom";
 import "./index.css";
 
+/* 
+week = 604800000 ms
+bi-week = 1209600000 ms
+year = 30758400000 ms
+*/
+
 class App extends React.Component {
   constructor(props) {
     super(props);
@@ -9,9 +15,25 @@ class App extends React.Component {
     this.state = {
       incomeItems: [],
       expenseItems: [],
-      balance: 0,
-      startDate: ""
+      startBalance: {}
     };
+  }
+
+  // WHEN USER SUBMITS STARTINGBALANCE FORM, CREATE AN ARRAY WHICH WE WILL USE TO PLOT THE GRAPH
+  createGraphPoints(startingDate, startingBalance) {
+    let balanceOverTimeArray = [];
+    for (let i = 0; i < 130; i++) {
+      balanceOverTimeArray.push({
+        date: startingDate + i * 1209600000,
+        balance: startingBalance
+      });
+    }
+    return console.log(balanceOverTimeArray);
+  }
+
+  // FUNCTION THAT WILL ROUND THE INPUT TIME TO THE NEAREST INTERVAL SET BY createGraphPoints()
+  roundToInterval(startOrOccuranceDate) {
+    console.log(Math.round(startOrOccuranceDate / 1209600000) * 1209600000);
   }
 
   // HANDLE SUBMISSION OF ITEM
@@ -22,36 +44,46 @@ class App extends React.Component {
       description: e.target[0].value,
       amount: e.target[1].value,
       frequency: e.target[2].value,
-      startOrOccuranceDate: e.target[3].value,
+      startOrOccuranceDate: Date.parse(e.target[3].value),
       incomeOrExpense: e.target[4].checked
     };
 
+    // ADD THE SUBMITTED ITEM INTO INCOME OR EXPENSE ARRAY
     if (inputObject.incomeOrExpense) {
       this.state.incomeItems.push(inputObject);
     } else {
       this.state.expenseItems.push(inputObject);
     }
 
-    this.setState(
-      ((this.state.incomeItems: incomeItems),
-      (this.state.expenseItems: expenseItems))
-    );
-    console.log(this.state.incomeItems);
+    // ADD THE SUBMITTED ITEM TO balanceOverTimeArray AT CORRECT INTERVALS
+    if (inputObject.frequency === "One-time") {
+      this.roundToInterval(inputObject.startOrOccuranceDate);
+    } else if (inputObject.frequency === "Weekly") {
+    } else if (inputObject.frequency === "Bi-weekly") {
+    } else if (inputObject.frequency === "Monthly") {
+    } else if (inputObject.frequency === "Annually") {
+    }
+
+    this.setState((this.state.incomeItems, this.state.expenseItems));
   };
 
   // HANDLE SUBMISSION OF STARTINGBALANCE
   handleSubmitStartingBalance = e => {
     e.preventDefault();
 
-    const submittedBalance = {
-      startDate: e.target[0].value,
-      balance: e.target[1].value
+    const startBalanceObject = {
+      startingDate: e.target[0].value,
+      startingBalance: e.target[1].value
     };
 
-    this.setState(
-      (this.state.balance: balance),
-      (this.state.startDate: startDate)
+    this.createGraphPoints(
+      Date.parse(startBalanceObject.startingDate),
+      startBalanceObject.startingBalance
     );
+
+    this.setState({
+      startBalance: startBalanceObject
+    });
   };
 
   render() {
@@ -61,7 +93,9 @@ class App extends React.Component {
         <ItemTable title="Income" items={this.state.incomeItems} />
         <ItemTable title="Expense" items={this.state.expenseItems} />
         <InputBox handleSubmit={this.handleSubmit} />
-        <StartingBalanceBox handleSubmit={this.handleSubmitStartingBalance} />
+        <StartingBalanceBox
+          handleSubmitStartingBalance={this.handleSubmitStartingBalance}
+        />
       </div>
     );
   }
@@ -99,9 +133,9 @@ class ItemTable extends React.Component {
 }
 
 class ItemRow extends React.Component {
-  propTypes: {
-    description: ReactProptypes.string.isRequired
-  };
+  //   propTypes: {
+  //     description: ReactProptypes.string.isRequired
+  //   };
 
   render() {
     const description = this.props.item.description;
@@ -161,7 +195,7 @@ class StartingBalanceBox extends React.Component {
       <div>
         <form
           className="form"
-          onSubmit={this.props.handleSubmitStartingBalance}
+          onSubmit={e => this.props.handleSubmitStartingBalance(e)}
         >
           <h2>Starting Balance</h2>
           <input name="startDate" type="text" placeholder="Start date" />
