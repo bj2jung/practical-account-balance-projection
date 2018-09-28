@@ -1,4 +1,5 @@
-import React, { Component } from "react";
+import React from "react";
+// import { Component } from "react";
 import ReactDOM from "react-dom";
 import "./index.css";
 
@@ -15,26 +16,37 @@ class App extends React.Component {
     this.state = {
       incomeItems: [],
       expenseItems: [],
-      startBalance: {}
+      startBalance: {},
+      graphPointsArray: []
     };
   }
 
   // WHEN USER SUBMITS STARTINGBALANCE FORM, CREATE AN ARRAY WHICH WE WILL USE TO PLOT THE GRAPH
   createGraphPoints(startingDate, startingBalance) {
-    let balanceOverTimeArray = [];
-    for (let i = 0; i < 130; i++) {
-      balanceOverTimeArray.push({
+    let graphPointsArray = [{ date: startingDate, balance: startingBalance }];
+
+    for (let i = 1; i < 128; i++) {
+      graphPointsArray.push({
         date: startingDate + i * 1209600000,
-        balance: startingBalance
+        balance: graphPointsArray[i - 1].balance
       });
     }
-    return console.log(balanceOverTimeArray);
+
+    this.setState({ graphPointsArray: graphPointsArray });
   }
 
   // FUNCTION THAT WILL ROUND THE INPUT TIME TO THE NEAREST INTERVAL SET BY createGraphPoints()
   roundToInterval(startOrOccuranceDate) {
-    console.log(Math.round(startOrOccuranceDate / 1209600000) * 1209600000);
+    const startBalanceDate = Date.parse(this.state.startBalance.startingDate);
+    return (
+      Math.round(Date.parse(startOrOccuranceDate) / 1209600000) * 1209600000 -
+      (Math.round(startBalanceDate / 1209600000) * 1209600000 -
+        startBalanceDate)
+    );
   }
+
+  // FUNCTION THAT WILL UPDATE THE BALANCE GRAPH FOR "ONE-TIME" ITEMS
+  updateGraphForOneTime(targetArray) {}
 
   // HANDLE SUBMISSION OF ITEM
   handleSubmit = e => {
@@ -42,9 +54,9 @@ class App extends React.Component {
 
     const inputObject = {
       description: e.target[0].value,
-      amount: e.target[1].value,
+      amount: parseInt(e.target[1].value),
       frequency: e.target[2].value,
-      startOrOccuranceDate: Date.parse(e.target[3].value),
+      startOrOccuranceDate: e.target[3].value,
       incomeOrExpense: e.target[4].checked
     };
 
@@ -57,7 +69,10 @@ class App extends React.Component {
 
     // ADD THE SUBMITTED ITEM TO balanceOverTimeArray AT CORRECT INTERVALS
     if (inputObject.frequency === "One-time") {
-      this.roundToInterval(inputObject.startOrOccuranceDate);
+      const i = this.state.graphPointsArray.findIndex(
+        x => x.date === this.roundToInterval(inputObject.startOrOccuranceDate)
+      );
+      this.state.graphPointsArray[i].balance += inputObject.amount;
     } else if (inputObject.frequency === "Weekly") {
     } else if (inputObject.frequency === "Bi-weekly") {
     } else if (inputObject.frequency === "Monthly") {
@@ -73,9 +88,10 @@ class App extends React.Component {
 
     const startBalanceObject = {
       startingDate: e.target[0].value,
-      startingBalance: e.target[1].value
+      startingBalance: parseInt(e.target[1].value)
     };
 
+    // CREATE THE INITIAL ARRAY USING THE USER INPUT FROM "STARTING BALANCE" FORM
     this.createGraphPoints(
       Date.parse(startBalanceObject.startingDate),
       startBalanceObject.startingBalance
