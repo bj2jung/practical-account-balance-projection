@@ -21,18 +21,20 @@ class App extends React.Component {
     };
   }
 
-  // WHEN USER SUBMITS STARTINGBALANCE FORM, CREATE AN ARRAY WHICH WE WILL USE TO PLOT THE GRAPH
+  // WHEN USER SUBMITS STARTINGBALANCE OR ITEM VIA FORM, CREATE AN ARRAY WHICH WE WILL USE TO PLOT THE GRAPH
   createGraphPoints(startingDate, startingBalance) {
-    let graphPointsArray = [{ date: startingDate, balance: startingBalance }];
+    let startingGraphPointsArray = [
+      { date: startingDate, balance: startingBalance }
+    ];
 
     for (let i = 1; i < 128; i++) {
-      graphPointsArray.push({
+      startingGraphPointsArray.push({
         date: startingDate + i * 1209600000,
-        balance: graphPointsArray[i - 1].balance
+        balance: startingGraphPointsArray[i - 1].balance
       });
     }
 
-    this.setState({ graphPointsArray: graphPointsArray });
+    this.setState({ graphPointsArray: startingGraphPointsArray });
   }
 
   // FUNCTION THAT WILL ROUND THE INPUT TIME TO THE NEAREST INTERVAL SET BY createGraphPoints()
@@ -45,8 +47,26 @@ class App extends React.Component {
     );
   }
 
-  // FUNCTION THAT WILL UPDATE THE BALANCE GRAPH FOR "ONE-TIME" ITEMS
-  updateGraphForOneTime(targetArray) {}
+  //FUNCTION THAT WILL UPDATE GRAPH
+  updateGraph(array, amount, indexOfInputDate) {
+    for (let i = 1; i < array.length; i++) {
+      if (i >= indexOfInputDate) {
+        array[i].balance += amount;
+      }
+    }
+    this.setState({ graphPointsArray: array });
+  }
+
+  //FUNCTION THAT WILL UPDATE GRAPH FOR RECURRING ITEMS
+  updateGraphForRecurringItems(array, amount, indexOfInputDate, interval) {
+    for (let i = 1; i < array.length; i++) {
+      if (i >= indexOfInputDate) {
+        array[i].balance +=
+          amount * Math.ceil((i - indexOfInputDate + 1) / interval);
+      }
+    }
+    this.setState({ graphPointsArray: array });
+  }
 
   // HANDLE SUBMISSION OF ITEM
   handleSubmit = e => {
@@ -54,7 +74,7 @@ class App extends React.Component {
 
     const inputObject = {
       description: e.target[0].value,
-      amount: parseInt(e.target[1].value),
+      amount: parseInt(e.target[1].value, 10),
       frequency: e.target[2].value,
       startOrOccuranceDate: e.target[3].value,
       incomeOrExpense: e.target[4].checked
@@ -68,18 +88,46 @@ class App extends React.Component {
     }
 
     // ADD THE SUBMITTED ITEM TO balanceOverTimeArray AT CORRECT INTERVALS
+    let indexOfInputDate = this.state.graphPointsArray.findIndex(
+      x => x.date === this.roundToInterval(inputObject.startOrOccuranceDate)
+    );
     if (inputObject.frequency === "One-time") {
-      const i = this.state.graphPointsArray.findIndex(
-        x => x.date === this.roundToInterval(inputObject.startOrOccuranceDate)
+      this.updateGraph(
+        this.state.graphPointsArray,
+        inputObject.amount,
+        indexOfInputDate
       );
-      this.state.graphPointsArray[i].balance += inputObject.amount;
     } else if (inputObject.frequency === "Weekly") {
+      this.updateGraphForRecurringItems(
+        this.state.graphPointsArray,
+        inputObject.amount * 2,
+        indexOfInputDate,
+        1
+      );
     } else if (inputObject.frequency === "Bi-weekly") {
+      this.updateGraphForRecurringItems(
+        this.state.graphPointsArray,
+        inputObject.amount,
+        indexOfInputDate,
+        1
+      );
     } else if (inputObject.frequency === "Monthly") {
+      this.updateGraphForRecurringItems(
+        this.state.graphPointsArray,
+        Math.round(inputObject.amount * 0.94382),
+        indexOfInputDate,
+        2
+      );
     } else if (inputObject.frequency === "Annually") {
+      this.updateGraphForRecurringItems(
+        this.state.graphPointsArray,
+        inputObject.amount,
+        indexOfInputDate,
+        26.2
+      );
     }
 
-    this.setState((this.state.incomeItems, this.state.expenseItems));
+    // this.setState((this.state.incomeItems, this.state.expenseItems));
   };
 
   // HANDLE SUBMISSION OF STARTINGBALANCE
@@ -88,7 +136,7 @@ class App extends React.Component {
 
     const startBalanceObject = {
       startingDate: e.target[0].value,
-      startingBalance: parseInt(e.target[1].value)
+      startingBalance: parseInt(e.target[1].value, 10)
     };
 
     // CREATE THE INITIAL ARRAY USING THE USER INPUT FROM "STARTING BALANCE" FORM
