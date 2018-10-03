@@ -2,12 +2,10 @@ import React from "react";
 // import { Component } from "react";
 import ReactDOM from "react-dom";
 import "./index.css";
-
-/* 
-week = 604800000 ms
-bi-week = 1209600000 ms
-year = 30758400000 ms
-*/
+import DatePicker from "react-datepicker";
+import moment from "moment";
+import "react-datepicker/dist/react-datepicker.css";
+import Chart from "./components/Chart.js";
 
 class App extends React.Component {
   constructor(props) {
@@ -17,8 +15,62 @@ class App extends React.Component {
       incomeItems: [],
       expenseItems: [],
       startBalance: {},
-      graphPointsArray: []
+      graphPointsArray: this.defaultGraphPoints(Date.now())
+      // chartData: {}
     };
+  }
+
+  // test
+  updatepoint() {
+    console.log(this.state);
+    this.setState({
+      chartData: {
+        data: [1],
+        backgroundColor: ["black"]
+      }
+    });
+  }
+
+  // test end
+
+  componentWillMount() {
+    this.getChartData();
+  }
+
+  // componentWillUpdate() {
+  //   this.getChartData();
+  // }
+
+  getChartData() {
+    let xAxis = this.state.graphPointsArray.map(x => x.date);
+    let balance = this.state.graphPointsArray.map(x => x.balance);
+
+    this.setState({
+      chartData: {
+        labels: xAxis,
+        datasets: [
+          {
+            data: balance,
+            backgroundColor: ["rgba(255, 99, 132, 0.6)"]
+          }
+        ]
+      }
+    });
+  }
+
+  // WHEN THE PAGE FIRST LOADS, POPULATE ARRAY STARTING AT CURRENT DATE
+  defaultGraphPoints(startingDate) {
+    let startingGraphPointsArray = [
+      { date: new Date(startingDate).toLocaleDateString(), balance: 1 }
+    ];
+
+    for (let i = 1; i < 128; i++) {
+      startingGraphPointsArray.push({
+        date: new Date(startingDate + i * 1209600000).toLocaleDateString(),
+        balance: startingGraphPointsArray[i - 1].balance
+      });
+    }
+    return startingGraphPointsArray;
   }
 
   // WHEN USER SUBMITS STARTINGBALANCE OR ITEM VIA FORM, CREATE AN ARRAY WHICH WE WILL USE TO PLOT THE GRAPH
@@ -33,8 +85,9 @@ class App extends React.Component {
         balance: startingGraphPointsArray[i - 1].balance
       });
     }
-
     this.setState({ graphPointsArray: startingGraphPointsArray });
+    this.getChartData();
+    // this.componentWillUpdate();
   }
 
   // FUNCTION THAT WILL ROUND THE INPUT TIME TO THE NEAREST INTERVAL SET BY createGraphPoints()
@@ -66,6 +119,7 @@ class App extends React.Component {
       }
     }
     this.setState({ graphPointsArray: array });
+    this.getChartData();
   }
 
   // HANDLE SUBMISSION OF ITEM
@@ -127,6 +181,10 @@ class App extends React.Component {
       );
     }
 
+    // this.getChartData();
+
+    this.componentWillMount();
+
     // this.setState((this.state.incomeItems, this.state.expenseItems));
   };
 
@@ -148,12 +206,17 @@ class App extends React.Component {
     this.setState({
       startBalance: startBalanceObject
     });
+
+    // test
+    // this.updatepoint();
+    // test end
   };
 
   render() {
     return (
       <div>
         <h1 className="App-header App-title">Practical Balance Sheet</h1>
+        <Chart chartData={this.state.chartData} />
         <ItemTable title="Income" items={this.state.incomeItems} />
         <ItemTable title="Expense" items={this.state.expenseItems} />
         <InputBox handleSubmit={this.handleSubmit} />
@@ -221,6 +284,19 @@ class ItemRow extends React.Component {
 
 //INPUT BOX START
 class InputBox extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      startDate: moment()
+    };
+    this.handleChange = this.handleChange.bind(this);
+  }
+
+  handleChange(date) {
+    this.setState({
+      startDate: date
+    });
+  }
   render() {
     return (
       <div>
@@ -235,10 +311,12 @@ class InputBox extends React.Component {
             <option value="Monthly">Monthly</option>
             <option value="Annually">Annually</option>
           </select>
-          <input
-            name="startOrOccuranceDate"
-            type="text"
-            placeholder="Add start/occurance date"
+          <DatePicker
+            selected={this.state.startDate}
+            onChange={this.handleChange}
+            showMonthDropdown
+            showYearDropdown
+            dropdownMode="select"
           />
           <input name="incomeOrExpense" type="checkbox" checked={null} />
           <button type="submit" disabled={null}>
@@ -254,6 +332,20 @@ class InputBox extends React.Component {
 
 // STARTING BALANCE BOX START
 class StartingBalanceBox extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      startDate: moment()
+    };
+    this.handleChange = this.handleChange.bind(this);
+  }
+
+  handleChange(date) {
+    this.setState({
+      startDate: date
+    });
+  }
+
   render() {
     return (
       <div>
@@ -262,7 +354,13 @@ class StartingBalanceBox extends React.Component {
           onSubmit={e => this.props.handleSubmitStartingBalance(e)}
         >
           <h2>Starting Balance</h2>
-          <input name="startDate" type="text" placeholder="Start date" />
+          <DatePicker
+            selected={this.state.startDate}
+            onChange={this.handleChange}
+            showMonthDropdown
+            showYearDropdown
+            dropdownMode="select"
+          />
           <input name="balance" type="text" placeholder="Starting balance" />
           <button type="submit" disabled={null}>
             Update
