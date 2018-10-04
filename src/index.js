@@ -5,57 +5,50 @@ import "./index.css";
 import DatePicker from "react-datepicker";
 import moment from "moment";
 import "react-datepicker/dist/react-datepicker.css";
-import Chart from "./components/Chart.js";
+// import Chart from "./components/Chart.js";
+import { Line } from "react-chartjs-2";
 
 class App extends React.Component {
   constructor(props) {
     super(props);
 
+    this.drawLineGraph = this.drawLineGraph.bind(this);
+
     this.state = {
       incomeItems: [],
       expenseItems: [],
       startBalance: {},
-      graphPointsArray: this.defaultGraphPoints(Date.now())
-      // chartData: {}
-    };
-  }
-
-  // test
-  updatepoint() {
-    console.log(this.state);
-    this.setState({
+      graphPointsArray: this.defaultGraphPoints(Date.now()),
       chartData: {
-        data: [1],
-        backgroundColor: ["black"]
-      }
-    });
-  }
-
-  // test end
-
-  componentWillMount() {
-    this.getChartData();
-  }
-
-  // componentWillUpdate() {
-  //   this.getChartData();
-  // }
-
-  getChartData() {
-    let xAxis = this.state.graphPointsArray.map(x => x.date);
-    let balance = this.state.graphPointsArray.map(x => x.balance);
-
-    this.setState({
-      chartData: {
-        labels: xAxis,
+        labels: [],
         datasets: [
           {
-            data: balance,
+            data: [],
             backgroundColor: ["rgba(255, 99, 132, 0.6)"]
           }
         ]
       }
-    });
+    };
+
+    console.log(this.state.chartData);
+  }
+
+  drawLineGraph() {
+    const chartData = () => {
+      return {
+        labels: this.state.graphPointsArray.map(x =>
+          new Date(x.date).toLocaleDateString()
+        ),
+        datasets: [
+          {
+            data: this.state.graphPointsArray.map(x => x.balance),
+            backgroundColor: ["rgba(255, 99, 132, 0.6)"]
+          }
+        ]
+      };
+    };
+
+    this.setState({ chartData });
   }
 
   // WHEN THE PAGE FIRST LOADS, POPULATE ARRAY STARTING AT CURRENT DATE
@@ -86,8 +79,6 @@ class App extends React.Component {
       });
     }
     this.setState({ graphPointsArray: startingGraphPointsArray });
-    this.getChartData();
-    // this.componentWillUpdate();
   }
 
   // FUNCTION THAT WILL ROUND THE INPUT TIME TO THE NEAREST INTERVAL SET BY createGraphPoints()
@@ -101,7 +92,7 @@ class App extends React.Component {
   }
 
   //FUNCTION THAT WILL UPDATE GRAPH
-  updateGraph(array, amount, indexOfInputDate) {
+  updateGraphForOneTimeItems(array, amount, indexOfInputDate) {
     for (let i = 1; i < array.length; i++) {
       if (i >= indexOfInputDate) {
         array[i].balance += amount;
@@ -119,11 +110,10 @@ class App extends React.Component {
       }
     }
     this.setState({ graphPointsArray: array });
-    this.getChartData();
   }
 
   // HANDLE SUBMISSION OF ITEM
-  handleSubmit = e => {
+  handleSubmitItem = e => {
     e.preventDefault();
 
     const inputObject = {
@@ -134,58 +124,55 @@ class App extends React.Component {
       incomeOrExpense: e.target[4].checked
     };
 
+    let x = 1;
     // ADD THE SUBMITTED ITEM INTO INCOME OR EXPENSE ARRAY
     if (inputObject.incomeOrExpense) {
       this.state.incomeItems.push(inputObject);
     } else {
       this.state.expenseItems.push(inputObject);
+      x = -1;
     }
 
-    // ADD THE SUBMITTED ITEM TO balanceOverTimeArray AT CORRECT INTERVALS
+    // ADD THE SUBMITTED ITEM TO graphPointsArray AT CORRECT INTERVALS
     let indexOfInputDate = this.state.graphPointsArray.findIndex(
       x => x.date === this.roundToInterval(inputObject.startOrOccuranceDate)
     );
+
     if (inputObject.frequency === "One-time") {
-      this.updateGraph(
+      this.updateGraphForOneTimeItems(
         this.state.graphPointsArray,
-        inputObject.amount,
+        inputObject.amount * x,
         indexOfInputDate
       );
     } else if (inputObject.frequency === "Weekly") {
       this.updateGraphForRecurringItems(
         this.state.graphPointsArray,
-        inputObject.amount * 2,
+        inputObject.amount * 2 * x,
         indexOfInputDate,
         1
       );
     } else if (inputObject.frequency === "Bi-weekly") {
       this.updateGraphForRecurringItems(
         this.state.graphPointsArray,
-        inputObject.amount,
+        inputObject.amount * x,
         indexOfInputDate,
         1
       );
     } else if (inputObject.frequency === "Monthly") {
       this.updateGraphForRecurringItems(
         this.state.graphPointsArray,
-        Math.round(inputObject.amount * 0.94382),
+        Math.round(inputObject.amount * 0.94382) * x,
         indexOfInputDate,
         2
       );
     } else if (inputObject.frequency === "Annually") {
       this.updateGraphForRecurringItems(
         this.state.graphPointsArray,
-        inputObject.amount,
+        inputObject.amount * x,
         indexOfInputDate,
         26.2
       );
     }
-
-    // this.getChartData();
-
-    this.componentWillMount();
-
-    // this.setState((this.state.incomeItems, this.state.expenseItems));
   };
 
   // HANDLE SUBMISSION OF STARTINGBALANCE
@@ -207,19 +194,17 @@ class App extends React.Component {
       startBalance: startBalanceObject
     });
 
-    // test
-    // this.updatepoint();
-    // test end
+    this.drawLineGraph();
   };
 
   render() {
     return (
       <div>
         <h1 className="App-header App-title">Practical Balance Sheet</h1>
-        <Chart chartData={this.state.chartData} />
+        <Line data={this.state.chartData} />
         <ItemTable title="Income" items={this.state.incomeItems} />
         <ItemTable title="Expense" items={this.state.expenseItems} />
-        <InputBox handleSubmit={this.handleSubmit} />
+        <InputBox handleSubmitItem={this.handleSubmitItem} />
         <StartingBalanceBox
           handleSubmitStartingBalance={this.handleSubmitStartingBalance}
         />
@@ -260,10 +245,6 @@ class ItemTable extends React.Component {
 }
 
 class ItemRow extends React.Component {
-  //   propTypes: {
-  //     description: ReactProptypes.string.isRequired
-  //   };
-
   render() {
     const description = this.props.item.description;
     const amount = this.props.item.amount;
@@ -300,7 +281,7 @@ class InputBox extends React.Component {
   render() {
     return (
       <div>
-        <form className="form" onSubmit={this.props.handleSubmit}>
+        <form className="form" onSubmit={this.props.handleSubmitItem}>
           <h2>Add Item</h2>
           <input name="description" type="text" placeholder="Add description" />
           <input name="amount" type="text" placeholder="Add amount" />
