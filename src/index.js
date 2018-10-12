@@ -18,8 +18,9 @@ class App extends React.Component {
       incomeItems: [],
       expenseItems: [],
       startBalance: {},
-      graphPointsArray: this.defaultGraphPoints(Date.now()),
+      graphPointsArray: [],
       chartData: {
+        title: "Projected Balance Over 5 Years",
         labels: [],
         datasets: [
           {
@@ -29,8 +30,6 @@ class App extends React.Component {
         ]
       }
     };
-
-    console.log(this.state.chartData);
   }
 
   drawLineGraph() {
@@ -49,21 +48,6 @@ class App extends React.Component {
     };
 
     this.setState({ chartData });
-  }
-
-  // WHEN THE PAGE FIRST LOADS, POPULATE ARRAY STARTING AT CURRENT DATE
-  defaultGraphPoints(startingDate) {
-    let startingGraphPointsArray = [
-      { date: new Date(startingDate).toLocaleDateString(), balance: 1 }
-    ];
-
-    for (let i = 1; i < 128; i++) {
-      startingGraphPointsArray.push({
-        date: new Date(startingDate + i * 1209600000).toLocaleDateString(),
-        balance: startingGraphPointsArray[i - 1].balance
-      });
-    }
-    return startingGraphPointsArray;
   }
 
   // WHEN USER SUBMITS STARTINGBALANCE OR ITEM VIA FORM, CREATE AN ARRAY WHICH WE WILL USE TO PLOT THE GRAPH
@@ -116,9 +100,11 @@ class App extends React.Component {
   handleSubmitItem = e => {
     e.preventDefault();
 
+    let amount = e.target[1].value === "" ? 0 : parseInt(e.target[1].value, 10);
+
     const inputObject = {
       description: e.target[0].value,
-      amount: parseInt(e.target[1].value, 10),
+      amount: amount,
       frequency: e.target[2].value,
       startOrOccuranceDate: e.target[3].value,
       incomeOrExpense: e.target[4].checked
@@ -175,13 +161,28 @@ class App extends React.Component {
     }
   };
 
+  // REMOVE ITEM FROM INCOME/EXPENSE TABLES
+  handleRemoveItem = e => {
+    e.preventDefault();
+
+    // this.state.incomeItems = this.state.incomeItems.splice(0, 1);
+
+    // console.log(this.state.incomeItems);
+    // console.log(this.state.expenseItems);
+
+    this.setState({ incomeItems: this.state.incomeItems });
+  };
+
   // HANDLE SUBMISSION OF STARTINGBALANCE
   handleSubmitStartingBalance = e => {
     e.preventDefault();
 
+    let balance =
+      e.target[1].value === "" ? 0 : parseInt(e.target[1].value, 10);
+
     const startBalanceObject = {
       startingDate: e.target[0].value,
-      startingBalance: parseInt(e.target[1].value, 10)
+      startingBalance: balance
     };
 
     // CREATE THE INITIAL ARRAY USING THE USER INPUT FROM "STARTING BALANCE" FORM
@@ -201,10 +202,20 @@ class App extends React.Component {
     return (
       <div>
         <h1 className="App-header App-title">Practical Balance Sheet</h1>
-        <Line data={this.state.chartData} />
-        <ItemTable title="Income" items={this.state.incomeItems} />
-        <ItemTable title="Expense" items={this.state.expenseItems} />
-        <InputBox handleSubmitItem={this.handleSubmitItem} />
+        <div className="chart">
+          <Line data={this.state.chartData} />
+        </div>
+        <ItemTable
+          title="Income"
+          items={this.state.incomeItems}
+          handleRemoveItem={this.handleRemoveItem}
+        />
+        <ItemTable
+          title="Expense"
+          items={this.state.expenseItems}
+          handleRemoveItem={this.handleRemoveItem}
+        />
+        <AddItemBox handleSubmitItem={this.handleSubmitItem} />
         <StartingBalanceBox
           handleSubmitStartingBalance={this.handleSubmitStartingBalance}
         />
@@ -221,7 +232,13 @@ class ItemTable extends React.Component {
 
     if (this.props.items.length > 0) {
       this.props.items.forEach(item => {
-        rows.push(<ItemRow item={item} key={item.description} />);
+        rows.push(
+          <ItemRow
+            item={item}
+            key={item.description}
+            handleRemoveItem={this.props.handleRemoveItem}
+          />
+        );
       });
     }
 
@@ -231,10 +248,11 @@ class ItemTable extends React.Component {
         <table>
           <thead>
             <tr>
-              <th>Description</th>
-              <th>Amount</th>
-              <th>Frequency</th>
-              <th>Start/Occurance</th>
+              <th className="column1">Description</th>
+              <th className="column2">Amount</th>
+              <th className="column3">Frequency</th>
+              <th className="column4">Start/Occurance</th>
+              <th className="column5">Delete</th>
             </tr>
           </thead>
           <tbody>{rows}</tbody>
@@ -250,12 +268,18 @@ class ItemRow extends React.Component {
     const amount = this.props.item.amount;
     const frequency = this.props.item.frequency;
     const startOrOccuranceDate = this.props.item.startOrOccuranceDate;
+    // const key = this.props.key;
     return (
       <tr>
-        <td>{description}</td>
-        <td>{amount}</td>
-        <td>{frequency}</td>
-        <td>{startOrOccuranceDate}</td>
+        <td className="column1">{description}</td>
+        <td className="column2">{amount}</td>
+        <td className="column3">{frequency}</td>
+        <td className="column4">{startOrOccuranceDate}</td>
+        <td className="column5">
+          <button onClick={this.props.handleRemoveItem} /*id={key}*/>
+            Delete Item
+          </button>
+        </td>
       </tr>
     );
   }
@@ -264,7 +288,7 @@ class ItemRow extends React.Component {
 //ITEM TABLE END
 
 //INPUT BOX START
-class InputBox extends React.Component {
+class AddItemBox extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
