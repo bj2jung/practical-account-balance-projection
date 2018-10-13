@@ -7,6 +7,8 @@ import moment from "moment";
 import "react-datepicker/dist/react-datepicker.css";
 // import Chart from "./components/Chart.js";
 import { Line } from "react-chartjs-2";
+import "bootstrap/dist/css/bootstrap.min.css";
+import { Table } from "reactstrap";
 
 class App extends React.Component {
   constructor(props) {
@@ -202,23 +204,28 @@ class App extends React.Component {
     return (
       <div>
         <h1 className="App-header App-title">Practical Balance Sheet</h1>
-        <div className="chart">
+        <div className="container">
           <Line data={this.state.chartData} />
         </div>
-        <ItemTable
-          title="Income"
-          items={this.state.incomeItems}
-          handleRemoveItem={this.handleRemoveItem}
-        />
-        <ItemTable
-          title="Expense"
-          items={this.state.expenseItems}
-          handleRemoveItem={this.handleRemoveItem}
-        />
-        <AddItemBox handleSubmitItem={this.handleSubmitItem} />
-        <StartingBalanceBox
-          handleSubmitStartingBalance={this.handleSubmitStartingBalance}
-        />
+        <div className="row">
+          <ItemTable
+            title="Income"
+            items={this.state.incomeItems}
+            handleRemoveItem={this.handleRemoveItem}
+          />
+
+          <ItemTable
+            title="Expense"
+            items={this.state.expenseItems}
+            handleRemoveItem={this.handleRemoveItem}
+          />
+        </div>
+        <div className="row">
+          <AddItemBox handleSubmitItem={this.handleSubmitItem} />
+          <StartingBalanceBox
+            handleSubmitStartingBalance={this.handleSubmitStartingBalance}
+          />
+        </div>
       </div>
     );
   }
@@ -243,20 +250,22 @@ class ItemTable extends React.Component {
     }
 
     return (
-      <div>
-        <h2>{this.props.title}</h2>
-        <table>
-          <thead>
-            <tr>
-              <th className="column1">Description</th>
-              <th className="column2">Amount</th>
-              <th className="column3">Frequency</th>
-              <th className="column4">Start/Occurance</th>
-              <th className="column5">Delete</th>
-            </tr>
-          </thead>
-          <tbody>{rows}</tbody>
-        </table>
+      <div className="col-lg-6">
+        <h2 className="sub-header">{this.props.title}</h2>
+        <div className="border">
+          <Table striped>
+            <thead>
+              <tr>
+                <th>Description</th>
+                <th>Amount</th>
+                <th>Frequency</th>
+                <th>Start/Occurance</th>
+                <th>Delete</th>
+              </tr>
+            </thead>
+            <tbody>{rows}</tbody>
+          </Table>
+        </div>
       </div>
     );
   }
@@ -304,12 +313,25 @@ class AddItemBox extends React.Component {
   }
   render() {
     return (
-      <div>
-        <form className="form" onSubmit={this.props.handleSubmitItem}>
-          <h2>Add Item</h2>
-          <input name="description" type="text" placeholder="Add description" />
-          <input name="amount" type="text" placeholder="Add amount" />
-          <select name="frequency">
+      <div className="col-lg-6">
+        <h2 className="sub-header">Add Item</h2>
+        <form
+          className="form-group border"
+          onSubmit={this.props.handleSubmitItem}
+        >
+          <input
+            className="col-lg-2"
+            name="description"
+            type="text"
+            placeholder="Add description"
+          />
+          <input
+            className="col-lg-2"
+            name="amount"
+            type="text"
+            placeholder="Add amount"
+          />
+          <select className="col-lg-2" name="frequency">
             <option value="One-time">One-time</option>
             <option value="Weekly">Weekly</option>
             <option value="Bi-weekly">Bi-weekly</option>
@@ -324,7 +346,7 @@ class AddItemBox extends React.Component {
             dropdownMode="select"
           />
           <input name="incomeOrExpense" type="checkbox" checked={null} />
-          <button type="submit" disabled={null}>
+          <button className="col-lg-2" type="submit" disabled={null}>
             Add Item
           </button>
         </form>
@@ -353,12 +375,12 @@ class StartingBalanceBox extends React.Component {
 
   render() {
     return (
-      <div>
+      <div className="col-lg-6">
+        <h2 className="sub-header">Starting Balance</h2>
         <form
-          className="form"
+          className="form-group border"
           onSubmit={e => this.props.handleSubmitStartingBalance(e)}
         >
-          <h2>Starting Balance</h2>
           <DatePicker
             selected={this.state.startDate}
             onChange={this.handleChange}
