@@ -22,12 +22,28 @@ class App extends React.Component {
       startBalance: {},
       graphPointsArray: [],
       chartData: {
-        title: "Projected Balance Over 5 Years",
         labels: [],
         datasets: [
           {
-            data: [],
-            backgroundColor: ["rgba(255, 99, 132, 0.6)"]
+            label: "Projected Balance",
+            fill: false,
+            lineTension: 0.1,
+            backgroundColor: "rgba(75,192,192,0.4)",
+            borderColor: "rgba(75,192,192,1)",
+            borderCapStyle: "butt",
+            borderDash: [],
+            borderDashOffset: 0.0,
+            borderJoinStyle: "miter",
+            pointBorderColor: "rgba(75,192,192,1)",
+            pointBackgroundColor: "#fff",
+            pointBorderWidth: 1,
+            pointHoverRadius: 5,
+            pointHoverBackgroundColor: "rgba(75,192,192,1)",
+            pointHoverBorderColor: "rgba(220,220,220,1)",
+            pointHoverBorderWidth: 2,
+            pointRadius: 1,
+            pointHitRadius: 10,
+            data: []
           }
         ]
       }
@@ -42,8 +58,25 @@ class App extends React.Component {
         ),
         datasets: [
           {
-            data: this.state.graphPointsArray.map(x => x.balance),
-            backgroundColor: ["rgba(255, 99, 132, 0.6)"]
+            label: "Projected Balance",
+            fill: false,
+            lineTension: 0.1,
+            backgroundColor: "rgba(75,192,192,0.4)",
+            borderColor: "rgba(75,192,192,1)",
+            borderCapStyle: "butt",
+            borderDash: [],
+            borderDashOffset: 0.0,
+            borderJoinStyle: "miter",
+            pointBorderColor: "rgba(75,192,192,1)",
+            pointBackgroundColor: "#fff",
+            pointBorderWidth: 1,
+            pointHoverRadius: 5,
+            pointHoverBackgroundColor: "rgba(75,192,192,1)",
+            pointHoverBorderColor: "rgba(220,220,220,1)",
+            pointHoverBorderWidth: 2,
+            pointRadius: 1,
+            pointHitRadius: 10,
+            data: this.state.graphPointsArray.map(x => x.balance)
           }
         ]
       };
@@ -252,18 +285,18 @@ class ItemTable extends React.Component {
     return (
       <div className="col-lg-6">
         <h2 className="sub-header">{this.props.title}</h2>
-        <div className="border">
-          <Table striped>
+        <div className="border  table-wrapper-scroll-y">
+          <Table striped responsive>
             <thead>
               <tr>
-                <th>Description</th>
-                <th>Amount</th>
-                <th>Frequency</th>
-                <th>Start/Occurance</th>
-                <th>Delete</th>
+                <th className="column1">Description</th>
+                <th className="column2">Amount</th>
+                <th className="column3">Frequency</th>
+                <th className="column4">Start/Occurance</th>
+                <th className="column5" />
               </tr>
             </thead>
-            <tbody>{rows}</tbody>
+            <tbody className="tableBody">{rows}</tbody>
           </Table>
         </div>
       </div>
@@ -286,7 +319,7 @@ class ItemRow extends React.Component {
         <td className="column4">{startOrOccuranceDate}</td>
         <td className="column5">
           <button onClick={this.props.handleRemoveItem} /*id={key}*/>
-            Delete Item
+            Delete
           </button>
         </td>
       </tr>
@@ -313,14 +346,14 @@ class AddItemBox extends React.Component {
   }
   render() {
     return (
-      <div className="col-lg-6">
+      <div className="col-lg-6 form">
         <h2 className="sub-header">Add Item</h2>
         <form
-          className="form-group border"
+          className="form-inline border"
           onSubmit={this.props.handleSubmitItem}
         >
           <input
-            className="col-lg-2"
+            className="col-lg-5"
             name="description"
             type="text"
             placeholder="Add description"
@@ -331,7 +364,7 @@ class AddItemBox extends React.Component {
             type="text"
             placeholder="Add amount"
           />
-          <select className="col-lg-2" name="frequency">
+          <select className="col-lg-2 dropDown" name="frequency">
             <option value="One-time">One-time</option>
             <option value="Weekly">Weekly</option>
             <option value="Bi-weekly">Bi-weekly</option>
@@ -345,8 +378,19 @@ class AddItemBox extends React.Component {
             showYearDropdown
             dropdownMode="select"
           />
-          <input name="incomeOrExpense" type="checkbox" checked={null} />
-          <button className="col-lg-2" type="submit" disabled={null}>
+          <div className="col-lg-2">
+            <label>
+              <input name="incomeOrExpense" type="radio" defaultChecked />
+              Income
+            </label>
+          </div>
+          <div className="col-lg-2">
+            <label>
+              <input name="incomeOrExpense" type="radio" />
+              Expense
+            </label>
+          </div>
+          <button type="submit" disabled={null}>
             Add Item
           </button>
         </form>
@@ -375,10 +419,10 @@ class StartingBalanceBox extends React.Component {
 
   render() {
     return (
-      <div className="col-lg-6">
+      <div className="col-lg-6 form">
         <h2 className="sub-header">Starting Balance</h2>
         <form
-          className="form-group border"
+          className="form-inline border"
           onSubmit={e => this.props.handleSubmitStartingBalance(e)}
         >
           <DatePicker
