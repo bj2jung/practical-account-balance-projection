@@ -50,6 +50,31 @@ class App extends React.Component {
     };
   }
 
+  componentDidMount() {
+    this.hydrateStateWithLocalStorage();
+    this.drawLineGraph();
+  }
+
+  hydrateStateWithLocalStorage() {
+    // for all items in state
+    for (let key in this.state) {
+      // if the key exists in localStorage
+      if (localStorage.hasOwnProperty(key)) {
+        // get the key's value from localStorage
+        let value = localStorage.getItem(key);
+
+        // parse the localStorage string and setState
+        try {
+          value = JSON.parse(value);
+          this.setState({ [key]: value });
+        } catch (e) {
+          // handle empty string
+          this.setState({ [key]: value });
+        }
+      }
+    }
+  }
+
   drawLineGraph() {
     const chartData = () => {
       return {
@@ -118,6 +143,7 @@ class App extends React.Component {
       }
     }
     this.setState({ graphPointsArray: array });
+    localStorage.setItem("graphPointsArray", JSON.stringify(array));
   }
 
   //FUNCTION THAT WILL UPDATE GRAPH FOR RECURRING ITEMS
@@ -129,11 +155,13 @@ class App extends React.Component {
       }
     }
     this.setState({ graphPointsArray: array });
+    localStorage.setItem("graphPointsArray", JSON.stringify(array));
   }
 
   // HANDLE SUBMISSION OF ITEM
   handleSubmitItem = e => {
     e.preventDefault();
+    // console.log(e.target[5].checked);
 
     let amount = e.target[1].value === "" ? 0 : parseInt(e.target[1].value, 10);
 
@@ -142,17 +170,21 @@ class App extends React.Component {
       amount: amount,
       frequency: e.target[2].value,
       startOrOccuranceDate: e.target[3].value,
-      incomeOrExpense: e.target[4].checked
+      incomeBubble: e.target[4].checked,
+      expenseBubble: e.target[5].checked
     };
 
     let x = 1;
     // ADD THE SUBMITTED ITEM INTO INCOME OR EXPENSE ARRAY
-    if (inputObject.incomeOrExpense) {
+    if (inputObject.incomeBubble) {
       this.state.incomeItems.push(inputObject);
-    } else {
+    } else if (inputObject.expenseBubble) {
       this.state.expenseItems.push(inputObject);
       x = -1;
     }
+
+    const expenseItems = [...this.state.expenseItems];
+    const incomeItems = [...this.state.incomeItems];
 
     // ADD THE SUBMITTED ITEM TO graphPointsArray AT CORRECT INTERVALS
     let indexOfInputDate = this.state.graphPointsArray.findIndex(
@@ -194,19 +226,20 @@ class App extends React.Component {
         26.2
       );
     }
+    localStorage.setItem("expenseItems", JSON.stringify(expenseItems));
+    localStorage.setItem("incomeItems", JSON.stringify(incomeItems));
+    e.target.reset();
   };
 
   // REMOVE ITEM FROM INCOME/EXPENSE TABLES
-  handleRemoveItem = e => {
-    e.preventDefault();
+  handleRemoveItem(item) {
+    console.log(this);
+    console.log(item);
 
-    // this.state.incomeItems = this.state.incomeItems.splice(0, 1);
-
-    // console.log(this.state.incomeItems);
-    // console.log(this.state.expenseItems);
-
-    this.setState({ incomeItems: this.state.incomeItems });
-  };
+    // const expenseItems = this.state.expenseItems;
+    // const expenseItemsUpdated = expenseItems.filter(item => item.id !== id);
+    // this.setState({ expensItems: expenseItemsUpdated });
+  }
 
   // HANDLE SUBMISSION OF STARTINGBALANCE
   handleSubmitStartingBalance = e => {
@@ -231,6 +264,44 @@ class App extends React.Component {
     });
 
     this.drawLineGraph();
+
+    e.target.reset();
+  };
+
+  resetData = () => {
+    localStorage.clear();
+    this.setState({
+      incomeItems: [],
+      expenseItems: [],
+      startBalance: {},
+      graphPointsArray: [],
+      chartData: {
+        labels: [],
+        datasets: [
+          {
+            label: "Projected Balance",
+            fill: false,
+            lineTension: 0.1,
+            backgroundColor: "rgba(75,192,192,0.4)",
+            borderColor: "rgba(75,192,192,1)",
+            borderCapStyle: "butt",
+            borderDash: [],
+            borderDashOffset: 0.0,
+            borderJoinStyle: "miter",
+            pointBorderColor: "rgba(75,192,192,1)",
+            pointBackgroundColor: "#fff",
+            pointBorderWidth: 1,
+            pointHoverRadius: 5,
+            pointHoverBackgroundColor: "rgba(75,192,192,1)",
+            pointHoverBorderColor: "rgba(220,220,220,1)",
+            pointHoverBorderWidth: 2,
+            pointRadius: 1,
+            pointHitRadius: 10,
+            data: []
+          }
+        ]
+      }
+    });
   };
 
   render() {
@@ -259,6 +330,7 @@ class App extends React.Component {
             handleSubmitStartingBalance={this.handleSubmitStartingBalance}
           />
         </div>
+        <button onClick={this.resetData}>Reset Data</button>
       </div>
     );
   }
@@ -310,7 +382,9 @@ class ItemRow extends React.Component {
     const amount = this.props.item.amount;
     const frequency = this.props.item.frequency;
     const startOrOccuranceDate = this.props.item.startOrOccuranceDate;
+    const item = this.props.item;
     // const key = this.props.key;
+
     return (
       <tr>
         <td className="column1">{description}</td>
@@ -318,8 +392,8 @@ class ItemRow extends React.Component {
         <td className="column3">{frequency}</td>
         <td className="column4">{startOrOccuranceDate}</td>
         <td className="column5">
-          <button onClick={this.props.handleRemoveItem} /*id={key}*/>
-            Delete
+          <button onClick={() => this.props.handleRemoveItem(item)}>
+            Remove
           </button>
         </td>
       </tr>
@@ -378,17 +452,30 @@ class AddItemBox extends React.Component {
             showYearDropdown
             dropdownMode="select"
           />
-          <div className="col-lg-2">
-            <label>
-              <input name="incomeOrExpense" type="radio" defaultChecked />
-              Income
-            </label>
-          </div>
-          <div className="col-lg-2">
-            <label>
-              <input name="incomeOrExpense" type="radio" />
-              Expense
-            </label>
+          <div className="col-lg-4">
+            <div className="form-check col-lg-6">
+              <label className="form-check-label">
+                <input
+                  type="radio"
+                  className="form-check-input"
+                  id="income"
+                  name="incomeOrExpense"
+                />
+                Income
+              </label>
+            </div>
+            <div className="form-check col-lg-6">
+              <label className="form-check-label">
+                <input
+                  type="radio"
+                  className="form-check-input"
+                  id="expense"
+                  name="incomeOrExpense"
+                  defaultChecked
+                />
+                Expense
+              </label>
+            </div>
           </div>
           <button type="submit" disabled={null}>
             Add Item
