@@ -16,6 +16,8 @@ class App extends React.Component {
 
     this.drawLineGraph = this.drawLineGraph.bind(this);
 
+    this.handleRemoveItem = this.handleRemoveItem.bind(this);
+
     this.state = {
       incomeItems: [],
       expenseItems: [],
@@ -233,12 +235,18 @@ class App extends React.Component {
 
   // REMOVE ITEM FROM INCOME/EXPENSE TABLES
   handleRemoveItem(item) {
-    console.log(this);
-    console.log(item);
+    const incomeItems = [...this.state.incomeItems];
+    const expenseItems = [...this.state.expenseItems];
 
-    // const expenseItems = this.state.expenseItems;
-    // const expenseItemsUpdated = expenseItems.filter(item => item.id !== id);
-    // this.setState({ expensItems: expenseItemsUpdated });
+    if (item.incomeBubble) {
+      let incomeItemsUpdated = incomeItems.filter(items => items !== item);
+      this.setState({ incomeItems: incomeItemsUpdated });
+      localStorage.setItem("incomeItems", JSON.stringify(incomeItemsUpdated));
+    } else {
+      let expenseItemsUpdated = expenseItems.filter(items => items !== item);
+      this.setState({ expenseItems: expenseItemsUpdated });
+      localStorage.setItem("expenseItems", JSON.stringify(expenseItemsUpdated));
+    }
   }
 
   // HANDLE SUBMISSION OF STARTINGBALANCE
