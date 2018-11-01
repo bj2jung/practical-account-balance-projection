@@ -1,11 +1,9 @@
 import React from "react";
-// import { Component } from "react";
 import ReactDOM from "react-dom";
 import "./index.css";
 import DatePicker from "react-datepicker";
 import moment from "moment";
 import "react-datepicker/dist/react-datepicker.css";
-// import Chart from "./components/Chart.js";
 import { Line } from "react-chartjs-2";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { Table } from "reactstrap";
@@ -58,19 +56,14 @@ class App extends React.Component {
   }
 
   hydrateStateWithLocalStorage() {
-    // for all items in state
     for (let key in this.state) {
-      // if the key exists in localStorage
       if (localStorage.hasOwnProperty(key)) {
-        // get the key's value from localStorage
         let value = localStorage.getItem(key);
 
-        // parse the localStorage string and setState
         try {
           value = JSON.parse(value);
           this.setState({ [key]: value });
         } catch (e) {
-          // handle empty string
           this.setState({ [key]: value });
         }
       }
@@ -163,7 +156,6 @@ class App extends React.Component {
   // HANDLE SUBMISSION OF ITEM
   handleSubmitItem = e => {
     e.preventDefault();
-    // console.log(e.target[5].checked);
 
     let amount = e.target[1].value === "" ? 0 : parseInt(e.target[1].value, 10);
 
@@ -391,7 +383,6 @@ class ItemRow extends React.Component {
     const frequency = this.props.item.frequency;
     const startOrOccuranceDate = this.props.item.startOrOccuranceDate;
     const item = this.props.item;
-    // const key = this.props.key;
 
     return (
       <tr>
@@ -408,8 +399,6 @@ class ItemRow extends React.Component {
     );
   }
 }
-
-//ITEM TABLE END
 
 //INPUT BOX START
 class AddItemBox extends React.Component {
@@ -494,8 +483,6 @@ class AddItemBox extends React.Component {
   }
 }
 
-//INPUT BOX END
-
 // STARTING BALANCE BOX START
 class StartingBalanceBox extends React.Component {
   constructor(props) {
@@ -536,7 +523,5 @@ class StartingBalanceBox extends React.Component {
     );
   }
 }
-
-// STARTING BALANCE BOX END
 
 ReactDOM.render(<App />, document.getElementById("root"));
