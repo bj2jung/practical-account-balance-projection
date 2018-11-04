@@ -130,30 +130,67 @@ class App extends React.Component {
     );
   }
 
-  //FUNCTION THAT WILL UPDATE GRAPH
-  updateGraphForOneTimeItems(array, amount, indexOfInputDate) {
-    for (let i = 1; i < array.length; i++) {
-      if (i >= indexOfInputDate) {
-        array[i].balance += amount;
+  // FUNCTION THAT WILL UPDATE graphPointsArray
+  updateGraphPointsArray(array, amount, indexOfInputDate, interval) {
+    if (interval === 0) {
+      for (let i = 1; i < array.length; i++) {
+        if (i >= indexOfInputDate) {
+          array[i].balance += amount;
+        }
+      }
+    } else {
+      for (let i = 1; i < array.length; i++) {
+        if (i >= indexOfInputDate) {
+          array[i].balance +=
+            amount * Math.ceil((i - indexOfInputDate + 1) / interval);
+        }
       }
     }
     this.setState({ graphPointsArray: array });
     localStorage.setItem("graphPointsArray", JSON.stringify(array));
   }
 
-  //FUNCTION THAT WILL UPDATE GRAPH FOR RECURRING ITEMS
-  updateGraphForRecurringItems(array, amount, indexOfInputDate, interval) {
-    for (let i = 1; i < array.length; i++) {
-      if (i >= indexOfInputDate) {
-        array[i].balance +=
-          amount * Math.ceil((i - indexOfInputDate + 1) / interval);
-      }
+  // FUNCITON THAT IDENTIFIES CORRECT INTERVALS
+  intervalSeparator(inputObject, indexOfInputDate, x) {
+    if (inputObject.frequency === "One-time") {
+      this.updateGraphPointsArray(
+        this.state.graphPointsArray,
+        inputObject.amount * x,
+        indexOfInputDate,
+        0
+      );
+    } else if (inputObject.frequency === "Weekly") {
+      this.updateGraphPointsArray(
+        this.state.graphPointsArray,
+        inputObject.amount * 2 * x,
+        indexOfInputDate,
+        1
+      );
+    } else if (inputObject.frequency === "Bi-weekly") {
+      this.updateGraphPointsArray(
+        this.state.graphPointsArray,
+        inputObject.amount * x,
+        indexOfInputDate,
+        1
+      );
+    } else if (inputObject.frequency === "Monthly") {
+      this.updateGraphPointsArray(
+        this.state.graphPointsArray,
+        Math.round(inputObject.amount * 0.94382) * x,
+        indexOfInputDate,
+        2
+      );
+    } else if (inputObject.frequency === "Annually") {
+      this.updateGraphPointsArray(
+        this.state.graphPointsArray,
+        inputObject.amount * x,
+        indexOfInputDate,
+        26.2
+      );
     }
-    this.setState({ graphPointsArray: array });
-    localStorage.setItem("graphPointsArray", JSON.stringify(array));
   }
 
-  // HANDLE SUBMISSION OF ITEM
+  // ADD ADDED ITEM INTO INCOME/EXPENSE TABLES AND CALL FUNCTION THAT UPDATES graphPointsArray
   handleSubmitItem = e => {
     e.preventDefault();
 
@@ -169,57 +206,61 @@ class App extends React.Component {
     };
 
     let x = 1;
-    // ADD THE SUBMITTED ITEM INTO INCOME OR EXPENSE ARRAY
     if (inputObject.incomeBubble) {
       this.state.incomeItems.push(inputObject);
     } else if (inputObject.expenseBubble) {
       this.state.expenseItems.push(inputObject);
       x = -1;
-    }
+    } // ADD THE SUBMITTED ITEM INTO INCOME OR EXPENSE ARRAY
 
     const expenseItems = [...this.state.expenseItems];
     const incomeItems = [...this.state.incomeItems];
 
-    // ADD THE SUBMITTED ITEM TO graphPointsArray AT CORRECT INTERVALS
     let indexOfInputDate = this.state.graphPointsArray.findIndex(
       x => x.date === this.roundToInterval(inputObject.startOrOccuranceDate)
-    );
+    ); // ADD THE SUBMITTED ITEM TO graphPointsArray AT CORRECT INTERVALS
 
+    this.intervalSeparator(inputObject, indexOfInputDate, x);
+
+    /*
     if (inputObject.frequency === "One-time") {
-      this.updateGraphForOneTimeItems(
+      this.updateGraphPointsArray(
         this.state.graphPointsArray,
         inputObject.amount * x,
-        indexOfInputDate
+        indexOfInputDate,
+        0
       );
     } else if (inputObject.frequency === "Weekly") {
-      this.updateGraphForRecurringItems(
+      this.updateGraphPointsArray(
         this.state.graphPointsArray,
         inputObject.amount * 2 * x,
         indexOfInputDate,
         1
       );
     } else if (inputObject.frequency === "Bi-weekly") {
-      this.updateGraphForRecurringItems(
+      this.updateGraphPointsArray(
         this.state.graphPointsArray,
         inputObject.amount * x,
         indexOfInputDate,
         1
       );
     } else if (inputObject.frequency === "Monthly") {
-      this.updateGraphForRecurringItems(
+      this.updateGraphPointsArray(
         this.state.graphPointsArray,
         Math.round(inputObject.amount * 0.94382) * x,
         indexOfInputDate,
         2
       );
     } else if (inputObject.frequency === "Annually") {
-      this.updateGraphForRecurringItems(
+      this.updateGraphPointsArray(
         this.state.graphPointsArray,
         inputObject.amount * x,
         indexOfInputDate,
         26.2
       );
     }
+    */
+
     localStorage.setItem("expenseItems", JSON.stringify(expenseItems));
     localStorage.setItem("incomeItems", JSON.stringify(incomeItems));
     e.target.reset();
@@ -230,6 +271,19 @@ class App extends React.Component {
     const incomeItems = [...this.state.incomeItems];
     const expenseItems = [...this.state.expenseItems];
 
+    const inputObject = {
+      description: item.description,
+      amount: item.amount,
+      frequency: item.frequency,
+      startOrOccuranceDate: item.startOrOccuranceDate,
+      incomeBubble: item.incomeBubble,
+      expenseBubble: item.expenseBubble
+    };
+
+    let indexOfInputDate = this.state.graphPointsArray.findIndex(
+      x => x.date === this.roundToInterval(inputObject.startOrOccuranceDate)
+    );
+
     if (item.incomeBubble) {
       let incomeItemsUpdated = incomeItems.filter(items => items !== item);
       this.setState({ incomeItems: incomeItemsUpdated });
@@ -239,6 +293,10 @@ class App extends React.Component {
       this.setState({ expenseItems: expenseItemsUpdated });
       localStorage.setItem("expenseItems", JSON.stringify(expenseItemsUpdated));
     }
+
+    let x = inputObject.incomeBubble ? 1 : -1;
+
+    this.intervalSeparator(inputObject, indexOfInputDate, -x);
   }
 
   // HANDLE SUBMISSION OF STARTINGBALANCE
@@ -307,7 +365,9 @@ class App extends React.Component {
   render() {
     return (
       <div>
-        <h1 className="App-header App-title">Practical Balance Sheet</h1>
+        <h1 className="App-header App-title">
+          5-Year Account Balance Projection
+        </h1>
         <div className="container">
           <Line data={this.state.chartData} />
         </div>
