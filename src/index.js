@@ -222,45 +222,6 @@ class App extends React.Component {
 
     this.intervalSeparator(inputObject, indexOfInputDate, x);
 
-    /*
-    if (inputObject.frequency === "One-time") {
-      this.updateGraphPointsArray(
-        this.state.graphPointsArray,
-        inputObject.amount * x,
-        indexOfInputDate,
-        0
-      );
-    } else if (inputObject.frequency === "Weekly") {
-      this.updateGraphPointsArray(
-        this.state.graphPointsArray,
-        inputObject.amount * 2 * x,
-        indexOfInputDate,
-        1
-      );
-    } else if (inputObject.frequency === "Bi-weekly") {
-      this.updateGraphPointsArray(
-        this.state.graphPointsArray,
-        inputObject.amount * x,
-        indexOfInputDate,
-        1
-      );
-    } else if (inputObject.frequency === "Monthly") {
-      this.updateGraphPointsArray(
-        this.state.graphPointsArray,
-        Math.round(inputObject.amount * 0.94382) * x,
-        indexOfInputDate,
-        2
-      );
-    } else if (inputObject.frequency === "Annually") {
-      this.updateGraphPointsArray(
-        this.state.graphPointsArray,
-        inputObject.amount * x,
-        indexOfInputDate,
-        26.2
-      );
-    }
-    */
-
     localStorage.setItem("expenseItems", JSON.stringify(expenseItems));
     localStorage.setItem("incomeItems", JSON.stringify(incomeItems));
     e.target.reset();
