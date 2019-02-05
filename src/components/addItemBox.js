@@ -7,16 +7,25 @@ class AddItemBox extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      startDate: moment()
+      startDate: moment(),
+      endDate: moment()
     };
-    this.handleChange = this.handleChange.bind(this);
+    this.handleStartDateChange = this.handleStartDateChange.bind(this);
+    this.handleEndDateChange = this.handleEndDateChange.bind(this);
   }
 
-  handleChange(date) {
+  handleStartDateChange(date) {
     this.setState({
       startDate: date
     });
   }
+
+  handleEndDateChange(date) {
+    this.setState({
+      endDate: date
+    });
+  }
+
   render() {
     return (
       <div className="col-lg-6 form">
@@ -46,28 +55,33 @@ class AddItemBox extends React.Component {
           </select>
           <DatePicker
             selected={this.state.startDate}
-            onChange={this.handleChange}
+            onChange={this.handleStartDateChange}
             showMonthDropdown
             showYearDropdown
             dropdownMode="select"
           />
+
+          <input type="checkbox" />
+
+          <DatePicker
+            selected={this.state.endDate}
+            onChange={this.handleEndDateChange}
+            showMonthDropdown
+            showYearDropdown
+            dropdownMode="select"
+          />
+
           <div className="col-lg-4">
-            <div className="form-check col-lg-6">
-              <label className="form-check-label">
-                <input
-                  type="radio"
-                  className="form-check-input"
-                  id="income"
-                  name="incomeOrExpense"
-                />
+            <div className="col-lg-6">
+              <label>
+                <input type="radio" id="income" name="incomeOrExpense" />
                 Income
               </label>
             </div>
-            <div className="form-check col-lg-6">
-              <label className="form-check-label">
+            <div className="col-lg-6">
+              <label>
                 <input
                   type="radio"
-                  className="form-check-input"
                   id="expense"
                   name="incomeOrExpense"
                   defaultChecked

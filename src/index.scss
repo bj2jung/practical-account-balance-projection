@@ -13,21 +13,22 @@ body {
   grid-template-columns: 50% 25% 25%;
   height: 600px;
   box-sizing: border-box;
-}
-.chartsDiv .lineChartDiv {
-  width: 90%;
-  margin: auto;
-  min-width: 670px;
-}
-.chartsDiv .incomePieChartDiv {
-  width: 90%;
-  margin: auto;
-  min-width: 335px;
-}
-.chartsDiv .expensePieChartDiv {
-  width: 90%;
-  margin: auto;
-  min-width: 335px;
+
+  .lineChartDiv {
+    width: 90%;
+    margin: auto;
+    min-width: 670px;
+  }
+  .incomePieChartDiv {
+    width: 90%;
+    margin: auto;
+    min-width: 335px;
+  }
+  .expensePieChartDiv {
+    width: 90%;
+    margin: auto;
+    min-width: 335px;
+  }
 }
 
 .form {
@@ -41,22 +42,22 @@ h1 {
 .column1 {
   width: 35%;
 }
-
 .column2 {
   width: 15%;
 }
-
 .column3 {
   width: 15%;
 }
-
 .column4 {
   width: 25%;
 }
-
 .column5 {
   width: 10%;
 }
+
+// canvas {
+//   min-width: 400px;
+// }
 
 .table-wrapper-scroll-y {
   display: block;
@@ -67,5 +68,3 @@ h1 {
 .dropDown {
   height: 30px;
 }
-
-/*# sourceMappingURL=index.css.map */

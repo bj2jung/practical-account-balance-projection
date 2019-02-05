@@ -6,7 +6,7 @@ class ItemTable extends React.Component {
     const rows = [];
 
     if (this.props.items.length > 0) {
-      this.props.items.forEach(item => {
+      this.props.items.forEach((item, index) => {
         rows.push(
           <ItemRow
             item={item}
@@ -39,28 +39,47 @@ class ItemTable extends React.Component {
   }
 }
 
-class ItemRow extends React.Component {
-  render() {
-    const description = this.props.item.description;
-    const amount = this.props.item.amount;
-    const frequency = this.props.item.frequency;
-    const startOrOccuranceDate = this.props.item.startOrOccuranceDate;
-    const item = this.props.item;
+function ItemRow(props) {
+  const description = props.item.description;
+  const amount = props.item.amount;
+  const frequency = props.item.frequency;
+  const startOrOccuranceDate = props.item.startOrOccuranceDate;
+  const item = props.item;
 
-    return (
-      <tr>
-        <td className="column1">{description}</td>
-        <td className="column2">{amount}</td>
-        <td className="column3">{frequency}</td>
-        <td className="column4">{startOrOccuranceDate}</td>
-        <td className="column5">
-          <button onClick={() => this.props.handleRemoveItem(item)}>
-            Remove
-          </button>
-        </td>
-      </tr>
-    );
-  }
+  return (
+    <tr>
+      <td className="column1">{description}</td>
+      <td className="column2">{amount}</td>
+      <td className="column3">{frequency}</td>
+      <td className="column4">{startOrOccuranceDate}</td>
+      <td className="column5">
+        <button onClick={() => props.handleRemoveItem(item)}>Remove</button>
+      </td>
+    </tr>
+  );
 }
+// class ItemRow extends React.Component {
+//   render() {
+//     const description = this.props.item.description;
+//     const amount = this.props.item.amount;
+//     const frequency = this.props.item.frequency;
+//     const startOrOccuranceDate = this.props.item.startOrOccuranceDate;
+//     const item = this.props.item;
+
+//     return (
+//       <tr>
+//         <td className="column1">{description}</td>
+//         <td className="column2">{amount}</td>
+//         <td className="column3">{frequency}</td>
+//         <td className="column4">{startOrOccuranceDate}</td>
+//         <td className="column5">
+//           <button onClick={() => this.props.handleRemoveItem(item)}>
+//             Remove
+//           </button>
+//         </td>
+//       </tr>
+//     );
+//   }
+// }
 
 export default ItemTable;
