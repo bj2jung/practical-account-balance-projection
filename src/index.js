@@ -1,11 +1,10 @@
 import React from "react";
 import ReactDOM from "react-dom";
 import "./index.css";
-import "react-datepicker/dist/react-datepicker.css";
 import { Line, Doughnut } from "react-chartjs-2";
 import "bootstrap/dist/css/bootstrap.min.css";
 import ItemTable from "./components/itemTable.js";
-import AddItemBox from "./components/addItemBox.js";
+// import AddItemBox from "./components/addItemBox.js"; //won't need
 import StartingBalanceBox from "./components/startingBalanceBox";
 
 class App extends React.Component {
@@ -13,7 +12,8 @@ class App extends React.Component {
     super(props);
 
     this.changeChartPeriod = this.changeChartPeriod.bind(this);
-    this.handleRemoveItem = this.handleRemoveItem.bind(this); //TODO:
+    this.handleSubmitItem = this.handleSubmitItem.bind(this);
+    this.handleRemoveItem = this.handleRemoveItem.bind(this); //TODO: revisit
 
     this.state = {
       incomeItems: [],
@@ -153,7 +153,7 @@ class App extends React.Component {
         {
           label: "Accumulated Income",
           fill: "origin",
-          lineTension: 0.3,
+          lineTension: 0.1,
           backgroundColor: "rgba(75,192,192,0.4)",
           borderColor: "rgba(75,192,192,1)",
           borderCapStyle: "butt",
@@ -174,7 +174,7 @@ class App extends React.Component {
         {
           label: "Accumulated Expense",
           fill: "origin",
-          lineTension: 0.3,
+          lineTension: 0.1,
           backgroundColor: "rgba(244,191,66,0.4)",
           borderColor: "rgba(244,191,66,1)",
           borderCapStyle: "butt",
@@ -222,7 +222,7 @@ class App extends React.Component {
       let arr = this.handleItem(item, accountBalanceArray);
       for (let i = 0; i < this.state.chartPeriod; i++) {
         accountBalanceArray[i].balance += arr[i];
-        item.incomeBubble
+        item.incomeOrExpense === "Income"
           ? (accumulatedIncomeArray[i] += arr[i])
           : (accumulatedExpenseArray[i] += arr[i]);
       }
@@ -245,11 +245,15 @@ class App extends React.Component {
   handleItem(item, accountBalanceArray) {
     let interval;
     let amount;
-    let incomeOrExpense = item.incomeBubble ? 1 : -1;
+    let incomeOrExpense = item.incomeOrExpense === "Income" ? 1 : -1;
 
-    const startDateIndex = accountBalanceArray.findIndex(
+    let startDateIndex = accountBalanceArray.findIndex(
       i => i.date === this.roundToInterval(item.startOrOccuranceDate)
     );
+
+    if (startDateIndex < 0) {
+      startDateIndex = this.state.chartPeriod;
+    }
 
     let endDateIndex = accountBalanceArray.findIndex(
       i => i.date === this.roundToInterval(item.endDate)
@@ -341,28 +345,26 @@ class App extends React.Component {
   }
 
   // ADD ADDED ITEM INTO INCOME/EXPENSE TABLES AND CALL FUNCTION THAT UPDATES accountBalanceArray
-  handleSubmitItem = e => {
-    e.preventDefault();
-
+  handleSubmitItem(item) {
     const inputObject = {
-      description: e.target[0].value,
-      amount: e.target[1].value === "" ? 0 : parseInt(e.target[1].value, 10),
-      frequency: e.target[2].value,
-      startOrOccuranceDate: e.target[3].value,
-      endDateExists: e.target[4].checked,
-      endDate: e.target[4].checked ? e.target[5].value : null,
-      incomeBubble: e.target[6].checked,
-      expenseBubble: e.target[7].checked
+      description: item.description,
+      amount: item.amount === "" ? 0 : parseInt(item.amount, 10),
+      frequency: item.frequency,
+      startOrOccuranceDate: item.startDate,
+      endDateExists: item.endDateExists,
+      endDate: item.endDate,
+      incomeOrExpense: item.incomeOrExpense,
+      key: item.key
     };
 
     const incomeItems = this.state.incomeItems;
     const expenseItems = this.state.expenseItems;
     const arrayOfAllItems = this.state.arrayOfAllItems;
 
-    if (inputObject.incomeBubble) {
+    if (inputObject.incomeOrExpense === "Income") {
       incomeItems.push(inputObject);
       this.setState({ incomeItems: incomeItems });
-    } else if (inputObject.expenseBubble) {
+    } else {
       expenseItems.push(inputObject);
       this.setState({ expenseItems: expenseItems });
     }
@@ -380,20 +382,15 @@ class App extends React.Component {
       }
     );
     localStorage.setItem("state", JSON.stringify(this.state));
-
-    e.target.reset();
-  };
+  }
 
   // REMOVE ITEM FROM INCOME/EXPENSE TABLES
   handleRemoveItem(item) {
     const incomeItems = this.state.incomeItems;
     const expenseItems = this.state.expenseItems;
-    let incomeItemsUpdated;
-    let expenseItemsUpdated;
-    let arrayOfAllItemsUpdated = [];
-
-    incomeItemsUpdated = incomeItems.filter(items => items !== item);
-    expenseItemsUpdated = expenseItems.filter(items => items !== item);
+    const incomeItemsUpdated = incomeItems.filter(items => items !== item);
+    const expenseItemsUpdated = expenseItems.filter(items => items !== item);
+    const arrayOfAllItemsUpdated = [];
 
     incomeItemsUpdated.forEach(item => arrayOfAllItemsUpdated.push(item));
     expenseItemsUpdated.forEach(item => arrayOfAllItemsUpdated.push(item));
@@ -552,24 +549,30 @@ class App extends React.Component {
             </label>
           </div>
         </div>
-        <div className="row">
-          <ItemTable
-            title="Income"
-            items={this.state.incomeItems}
-            handleRemoveItem={this.handleRemoveItem}
-          />
-
-          <ItemTable
-            title="Expense"
-            items={this.state.expenseItems}
-            handleRemoveItem={this.handleRemoveItem}
-          />
-        </div>
-        <div className="row">
-          <AddItemBox handleSubmitItem={this.handleSubmitItem} />
-          <StartingBalanceBox
-            handleSubmitStartingBalance={this.handleSubmitStartingBalance}
-          />
+        <div className="itemTableDiv">
+          <div className="incomeTable">
+            <ItemTable
+              title="Income"
+              items={this.state.incomeItems}
+              handleSubmitItem={this.handleSubmitItem}
+              handleRemoveItem={this.handleRemoveItem}
+              incomeOrExpense="Income"
+            />
+          </div>
+          <div className="expenseTable">
+            <ItemTable
+              title="Expense"
+              items={this.state.expenseItems}
+              handleSubmitItem={this.handleSubmitItem}
+              handleRemoveItem={this.handleRemoveItem}
+              incomeOrExpense="Expense"
+            />
+          </div>
+          <div>
+            <StartingBalanceBox
+              handleSubmitStartingBalance={this.handleSubmitStartingBalance}
+            />
+          </div>
         </div>
         <button onClick={this.resetData}>Reset Data</button>
       </div>

@@ -30,32 +30,22 @@ body {
   min-width: 335px;
 }
 
-.form {
-  padding-top: 25px;
-}
-
 h1 {
   padding-bottom: 50px;
 }
 
-.column1 {
-  width: 35%;
+.itemTableDiv {
+  display: grid;
+  grid-template-columns: 50% 50%;
 }
-
-.column2 {
-  width: 15%;
+.itemTableDiv .incomeTable,
+.itemTableDiv .expenseTable {
+  max-width: 890px;
+  margin: auto;
 }
-
-.column3 {
-  width: 15%;
-}
-
-.column4 {
-  width: 25%;
-}
-
-.column5 {
-  width: 10%;
+.itemTableDiv #IncomeitemAmount,
+.itemTableDiv #ExpenseitemAmount {
+  max-width: 80px;
 }
 
 .table-wrapper-scroll-y {

@@ -31,32 +31,40 @@ body {
   }
 }
 
-.form {
-  padding-top: 25px;
-}
-
 h1 {
   padding-bottom: 50px;
 }
 
-.column1 {
-  width: 35%;
-}
-.column2 {
-  width: 15%;
-}
-.column3 {
-  width: 15%;
-}
-.column4 {
-  width: 25%;
-}
-.column5 {
-  width: 10%;
+.itemTableDiv {
+  display: grid;
+  grid-template-columns: 50% 50%;
+
+  .incomeTable,
+  .expenseTable {
+    max-width: 890px;
+    margin: auto;
+  }
+
+  #IncomeitemAmount,
+  #ExpenseitemAmount {
+    max-width: 80px;
+  }
 }
 
-// canvas {
-//   min-width: 400px;
+// .column1 {
+//   width: 35%;
+// }
+// .column2 {
+//   width: 15%;
+// }
+// .column3 {
+//   width: 15%;
+// }
+// .column4 {
+//   width: 25%;
+// }
+// .column5 {
+//   width: 10%;
 // }
 
 .table-wrapper-scroll-y {
