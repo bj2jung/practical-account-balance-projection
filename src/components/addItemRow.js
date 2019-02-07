@@ -3,7 +3,7 @@ import DatePicker from "react-datepicker";
 import moment from "moment";
 import "react-datepicker/dist/react-datepicker.css";
 
-class AddItemBox extends React.Component {
+class AddItemRow extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -12,11 +12,12 @@ class AddItemBox extends React.Component {
       description: null,
       amount: null,
       frequency: null,
-      endDateExists: null,
+      endDateExistsCheckBoxDisabled: true,
+      endDateExists: false,
       startDate: null,
       endDate: null,
       incomeOrExpense: this.props.incomeOrExpense,
-      key: 0
+      addItemKey: this.props.addItemKey
     };
     this.handleStartDateChange = this.handleStartDateChange.bind(this);
     this.handleEndDateChange = this.handleEndDateChange.bind(this);
@@ -31,6 +32,21 @@ class AddItemBox extends React.Component {
   handleEndDateChange(date) {
     this.setState({
       endDateSelector: date
+    });
+  }
+
+  handleEndDateCheckBoxClick() {
+    this.setState({
+      endDateExists: !this.state.endDateExists
+    });
+  }
+
+  handleFrequencySelect() {
+    const itemFrequency = document.querySelector(
+      `#${this.state.incomeOrExpense}itemFrequency`
+    ).value;
+    this.setState({
+      endDateExistsCheckBoxDisabled: itemFrequency === "One-time" ? true : false
     });
   }
 
@@ -55,20 +71,21 @@ class AddItemBox extends React.Component {
           .value
       : null;
 
-    let key = this.state.key + 0.1;
+    let addItemKey = this.props.addItemKey + 0.01;
 
     this.setState(
       {
         description: itemDescription.value,
-        amount: itemAmount.value,
+        amount: isNaN(itemAmount.value) ? 0 : itemAmount.value,
         frequency: itemFrequency,
         endDateExists: itemEndDateExists.checked,
         startDate: itemStartDate,
         endDate: itemEndDate,
-        key: key
+        key: addItemKey
       },
       () => {
         this.props.handleSubmitItem(this.state);
+        this.setState({ endDateExists: false });
       }
     );
 
@@ -83,7 +100,6 @@ class AddItemBox extends React.Component {
         <td>
           <input
             id={`${this.state.incomeOrExpense}itemDescription`}
-            name="description"
             type="text"
             placeholder="Add description"
           />
@@ -91,7 +107,6 @@ class AddItemBox extends React.Component {
         <td>
           <input
             id={`${this.state.incomeOrExpense}itemAmount`}
-            // name="amount"
             type="text"
             placeholder="Add amount"
           />
@@ -100,7 +115,7 @@ class AddItemBox extends React.Component {
           <select
             className="dropDown"
             id={`${this.state.incomeOrExpense}itemFrequency`}
-            // name="frequency"
+            onChange={() => this.handleFrequencySelect()}
           >
             <option value="One-time">One-time</option>
             <option value="Weekly">Weekly</option>
@@ -123,6 +138,8 @@ class AddItemBox extends React.Component {
           <input
             id={`${this.state.incomeOrExpense}itemEndDateExists`}
             type="checkbox"
+            onClick={() => this.handleEndDateCheckBoxClick()}
+            disabled={this.state.endDateExistsCheckBoxDisabled}
           />
         </td>
         <td>
@@ -133,6 +150,7 @@ class AddItemBox extends React.Component {
             showMonthDropdown
             showYearDropdown
             dropdownMode="select"
+            disabled={!this.state.endDateExists}
           />
         </td>
         <td>
@@ -151,4 +169,4 @@ class AddItemBox extends React.Component {
   }
 }
 
-export default AddItemBox;
+export default AddItemRow;

@@ -1,6 +1,6 @@
 import React from "react";
 import { Table } from "reactstrap";
-import AddItemBox from "./addItemBox.js";
+import AddItemRow from "./addItemRow.js";
 
 class ItemTable extends React.Component {
   render() {
@@ -19,10 +19,12 @@ class ItemTable extends React.Component {
     }
 
     rows.push(
-      <AddItemBox
+      <AddItemRow
         key="addItemRow"
         incomeOrExpense={this.props.incomeOrExpense}
         handleSubmitItem={this.props.handleSubmitItem}
+        endDateSelectorDisabled={this.props.endDateSelectorDisabled}
+        addItemKey={this.props.addItemKey}
       />
     );
 

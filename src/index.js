@@ -4,7 +4,6 @@ import "./index.css";
 import { Line, Doughnut } from "react-chartjs-2";
 import "bootstrap/dist/css/bootstrap.min.css";
 import ItemTable from "./components/itemTable.js";
-// import AddItemBox from "./components/addItemBox.js"; //won't need
 import StartingBalanceBox from "./components/startingBalanceBox";
 
 class App extends React.Component {
@@ -25,15 +24,13 @@ class App extends React.Component {
       accumulatedExpenseArray: [],
       chartPeriod: 27,
       incomeTotal: 0,
-      expenseTotal: 0
+      expenseTotal: 0,
+      incomeItemKey: 0,
+      expenseItemKey: 0
     };
   }
 
   componentDidMount() {
-    this.hydrateStateWithLocalStorage();
-  }
-
-  hydrateStateWithLocalStorage() {
     const storedState = JSON.parse(localStorage.getItem("state"));
 
     for (let key in storedState) {
@@ -246,31 +243,12 @@ class App extends React.Component {
     let interval;
     let amount;
     let incomeOrExpense = item.incomeOrExpense === "Income" ? 1 : -1;
-
-    let startDateIndex = accountBalanceArray.findIndex(
-      i => i.date === this.roundToInterval(item.startOrOccuranceDate)
-    );
-
-    if (startDateIndex < 0) {
-      startDateIndex = this.state.chartPeriod;
-    }
-
-    let endDateIndex = accountBalanceArray.findIndex(
-      i => i.date === this.roundToInterval(item.endDate)
-    );
-
-    if (item.endDateExists) {
-      endDateIndex =
-        endDateIndex === -1 ? this.state.chartPeriod - 1 : endDateIndex;
-    } else {
-      endDateIndex = this.state.chartPeriod - 1;
-    }
-
-    // const endDateIndex = item.endDateExists
-    //   ? accountBalanceArray.findIndex(
-    //       i => i.date === this.roundToInterval(item.endDate)
-    //     )
-    //   : this.state.chartPeriod;
+    let emptyArray = new Array(this.state.chartPeriod).fill(0);
+    const firstDayOfChartPeriod = accountBalanceArray[0].date;
+    const lastDayOfChartPeriod = accountBalanceArray[this.state.chartPeriod - 1]
+      ? accountBalanceArray[this.state.chartPeriod - 1].date
+      : null;
+    const startDateOfItem = Date.parse(item.startOrOccuranceDate);
 
     if (item.frequency === "One-time") {
       interval = 0;
@@ -287,6 +265,53 @@ class App extends React.Component {
     } else if (item.frequency === "Annually") {
       interval = 26;
       amount = item.amount;
+    }
+
+    let startDateIndex = accountBalanceArray.findIndex(
+      i => i.date === this.roundToInterval(item.startOrOccuranceDate)
+    );
+
+    if (startDateIndex === -1) {
+      if (startDateOfItem < firstDayOfChartPeriod) {
+        if (interval === 0) {
+          return emptyArray;
+        } else if (interval === 1) {
+          startDateIndex = 0;
+        } else if (interval === 2) {
+          startDateIndex =
+            Math.round((firstDayOfChartPeriod - startDateOfItem) / 1209600000) %
+            2
+              ? 1
+              : 0;
+        } else {
+          startDateIndex =
+            Math.round((startDateOfItem - firstDayOfChartPeriod) / 1209600000) +
+            26;
+          while (startDateIndex < 0) {
+            startDateIndex += 26;
+          }
+        }
+      } else if (lastDayOfChartPeriod < startDateOfItem) {
+        return emptyArray;
+      }
+    }
+
+    let endDateIndex;
+
+    if (!item.endDateExists) {
+      endDateIndex = this.state.chartPeriod - 1;
+    } else {
+      if (Date.parse(item.endDate) < firstDayOfChartPeriod) {
+        return emptyArray;
+      } else if (
+        lastDayOfChartPeriod < Date.parse(item.endDate) //TODO: this needs to run after a delay (once accountBalanceArray is filled)
+      ) {
+        endDateIndex = this.state.chartPeriod - 1;
+      } else {
+        endDateIndex = accountBalanceArray.findIndex(
+          i => i.date === this.roundToInterval(item.endDate)
+        );
+      }
     }
 
     return this.createArray(
@@ -363,10 +388,10 @@ class App extends React.Component {
 
     if (inputObject.incomeOrExpense === "Income") {
       incomeItems.push(inputObject);
-      this.setState({ incomeItems: incomeItems });
+      this.setState({ incomeItemKey: inputObject.key });
     } else {
       expenseItems.push(inputObject);
-      this.setState({ expenseItems: expenseItems });
+      this.setState({ expenseItemKey: inputObject.key });
     }
 
     arrayOfAllItems.push(inputObject);
@@ -439,7 +464,9 @@ class App extends React.Component {
         accumulatedExpenseArray: [],
         chartPeriod: 27,
         incomeTotal: 0,
-        expenseTotal: 0
+        expenseTotal: 0,
+        incomeItemKey: 0,
+        expenseItemKey: 0
       },
       () => {
         this.updateLineChartArrays();
@@ -557,6 +584,7 @@ class App extends React.Component {
               handleSubmitItem={this.handleSubmitItem}
               handleRemoveItem={this.handleRemoveItem}
               incomeOrExpense="Income"
+              addItemKey={this.state.incomeItemKey}
             />
           </div>
           <div className="expenseTable">
@@ -566,6 +594,7 @@ class App extends React.Component {
               handleSubmitItem={this.handleSubmitItem}
               handleRemoveItem={this.handleRemoveItem}
               incomeOrExpense="Expense"
+              addItemKey={this.state.expenseItemKey}
             />
           </div>
           <div>
