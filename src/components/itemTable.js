@@ -1,6 +1,7 @@
 import React from "react";
 import { Table } from "reactstrap";
 import AddItemRow from "./addItemRow.js";
+import EditItemRow from "./editItemRow.js";
 
 class ItemTable extends React.Component {
   render() {
@@ -13,10 +14,32 @@ class ItemTable extends React.Component {
             item={item}
             key={item.key}
             handleRemoveItem={this.props.handleRemoveItem}
+            handleEditItem={this.props.handleEditItem}
           />
         );
       });
     }
+    /////////////////
+    const editIndex = this.props.items.findIndex(
+      i => i.key === this.props.editKey
+    );
+    if (this.props.editKey) {
+      rows[editIndex] = (
+        <EditItemRow
+          key="editItemRow"
+          editKey={this.props.editKey}
+          incomeOrExpense={this.props.incomeOrExpense}
+          addEditedItem={this.props.addEditedItem}
+          endDateSelectorDisabled={this.props.endDateSelectorDisabled}
+          detailsBeforeEdit={this.props.items[editIndex]}
+          editIncomeItemEndDateCheckBoxDisabled={
+            this.props.editIncomeItemEndDateCheckBoxDisabled
+          }
+          editItemEndDateExists={this.props.editItemEndDateExists}
+        />
+      );
+    }
+    ////////////////
 
     rows.push(
       <AddItemRow
@@ -25,6 +48,7 @@ class ItemTable extends React.Component {
         handleSubmitItem={this.props.handleSubmitItem}
         endDateSelectorDisabled={this.props.endDateSelectorDisabled}
         addItemKey={this.props.addItemKey}
+        detailsBeforeEdit={null}
       />
     );
 
@@ -57,7 +81,7 @@ function ItemRow(props) {
     props.item.description === "" ? `No description` : props.item.description;
   const amount = props.item.amount;
   const frequency = props.item.frequency;
-  const startOrOccuranceDate = props.item.startOrOccuranceDate;
+  const startDate = props.item.startDate;
   const endDate = props.item.endDateExists ? props.item.endDate : "-";
   const item = props.item;
 
@@ -66,10 +90,13 @@ function ItemRow(props) {
       <td className="column1">{description}</td>
       <td className="column2">{amount}</td>
       <td className="column3">{frequency}</td>
-      <td className="column4">{startOrOccuranceDate}</td>
+      <td className="column4">{startDate}</td>
       <td className="column5" />
       <td className="column6">{endDate}</td>
       <td className="column7">
+        <button onClick={() => props.handleEditItem(item)}>edit</button>
+      </td>
+      <td className="column8">
         <button onClick={() => props.handleRemoveItem(item)}>-</button>
       </td>
     </tr>

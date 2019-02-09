@@ -3,7 +3,7 @@ import DatePicker from "react-datepicker";
 import moment from "moment";
 import "react-datepicker/dist/react-datepicker.css";
 
-class AddItemRow extends React.Component {
+class EditItemRow extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -12,12 +12,12 @@ class AddItemRow extends React.Component {
       description: null,
       amount: null,
       frequency: null,
-      endDateExistsCheckBoxDisabled: true,
-      endDateExists: false,
+      endDateExistsCheckBoxDisabled: this.props
+        .editIncomeItemEndDateCheckBoxDisabled,
+      endDateExists: this.props.editItemEndDateExists,
       startDate: null,
       endDate: null,
-      incomeOrExpense: this.props.incomeOrExpense,
-      addItemKey: this.props.addItemKey
+      incomeOrExpense: this.props.incomeOrExpense
     };
     this.handleStartDateChange = this.handleStartDateChange.bind(this);
     this.handleEndDateChange = this.handleEndDateChange.bind(this);
@@ -37,95 +37,115 @@ class AddItemRow extends React.Component {
 
   handleEndDateCheckBoxClick() {
     const itemEndDateExists = document.querySelector(
-      `#${this.state.incomeOrExpense}AddItemEndDateExists`
+      `#${this.state.incomeOrExpense}itemEndDateExists`
     ).checked;
+
     this.setState({
-      endDateExists: itemEndDateExists
+      endDateExists: itemEndDateExists ? true : false
     });
   }
 
-  handleFrequencySelect() {
+  handleFrequencySelect(descriptionBeforeEdit) {
     const itemFrequency = document.querySelector(
-      `#${this.state.incomeOrExpense}AddItemFrequency`
+      `#${this.state.incomeOrExpense}itemFrequency`
     ).value;
     const itemEndDateExists = document.querySelector(
-      `#${this.state.incomeOrExpense}AddItemEndDateExists`
+      `#${this.state.incomeOrExpense}itemEndDateExists`
     ).checked;
 
     this.setState({
+      endDateExistsCheckBoxDisabled:
+        itemFrequency === "One-time" ? true : false,
       endDateExists:
-        itemFrequency === "One-time" || !itemEndDateExists ? false : true,
-      endDateExistsCheckBoxDisabled: itemFrequency === "One-time" ? true : false
+        itemFrequency === "One-time" || !itemEndDateExists ? false : true
     });
   }
 
-  handleAddItem() {
+  handleConfirmEdit() {
     const itemDescription = document.querySelector(
-      `#${this.state.incomeOrExpense}AddItemDescription`
+      `#${this.state.incomeOrExpense}itemDescription`
     );
     const itemAmount = document.querySelector(
-      `#${this.state.incomeOrExpense}AddItemAmount`
+      `#${this.state.incomeOrExpense}itemAmount`
     );
     const itemFrequency = document.querySelector(
-      `#${this.state.incomeOrExpense}AddItemFrequency`
+      `#${this.state.incomeOrExpense}itemFrequency`
     ).value;
     const itemEndDateExists = document.querySelector(
-      `#${this.state.incomeOrExpense}AddItemEndDateExists`
+      `#${this.state.incomeOrExpense}itemEndDateExists`
     );
     const itemStartDate = document.querySelector(
-      `#${this.state.incomeOrExpense}AddItemStartDate`
+      `#${this.state.incomeOrExpense}itemStartDate`
     ).value;
     const itemEndDate = itemEndDateExists
-      ? document.querySelector(`#${this.state.incomeOrExpense}AddItemEndDate`)
+      ? document.querySelector(`#${this.state.incomeOrExpense}itemEndDate`)
           .value
       : null;
-
-    let addItemKey = this.props.addItemKey + 0.01;
 
     this.setState(
       {
         description: itemDescription.value,
         amount: isNaN(itemAmount.value) ? 0 : itemAmount.value,
         frequency: itemFrequency,
-        endDateExists:
-          itemFrequency === "One-time" ? false : itemEndDateExists.checked,
+        endDateExists: itemEndDateExists.checked,
         startDate: itemStartDate,
-        endDate: itemFrequency === "One-time" ? null : itemEndDate,
-        key: addItemKey
+        endDate: itemEndDate,
+        editKey: this.props.editKey
       },
       () => {
-        this.props.handleSubmitItem(this.state);
-        this.setState({ endDateExists: false });
+        this.props.addEditedItem(this.state);
+        // this.setState({ endDateExists: false });
       }
     );
 
-    itemDescription.value = "";
-    itemAmount.value = "";
-    itemEndDateExists.checked = false;
+    // itemDescription.value = "";
+    // itemAmount.value = "";
+    // itemEndDateExists.checked = false;
   }
 
   render() {
+    const detailsBeforeEdit = this.props.detailsBeforeEdit;
+    const descriptionBeforeEdit = detailsBeforeEdit
+      ? detailsBeforeEdit.description
+      : "";
+    const amountBeforeEdit = detailsBeforeEdit ? detailsBeforeEdit.amount : "";
+    const frequencyBeforeEdit = detailsBeforeEdit
+      ? detailsBeforeEdit.frequency
+      : "";
+    // const startDateBeforeEdit = this.props.detailsBeforeEdit
+    //   ? moment(new Date(detailsBeforeEdit.startDate))
+    //   : this.state.startDateSelector;
+    const endDateExistsBeforeEdit = detailsBeforeEdit
+      ? detailsBeforeEdit.endDateExists
+      : false;
+    // const endDateBeforeEdit = this.props.detailsBeforeEdit
+    //   ? moment(new Date(detailsBeforeEdit.endDate))
+    //   : this.state.endDateSelector;
+
     return (
       <tr>
         <td>
           <input
-            id={`${this.state.incomeOrExpense}AddItemDescription`}
+            id={`${this.state.incomeOrExpense}itemDescription`}
             type="text"
+            defaultValue={descriptionBeforeEdit}
             placeholder="Add description"
           />
         </td>
         <td>
           <input
-            id={`${this.state.incomeOrExpense}AddItemAmount`}
+            id={`${this.state.incomeOrExpense}itemAmount`}
             type="text"
             placeholder="Add amount"
+            defaultValue={amountBeforeEdit}
           />
         </td>
         <td>
           <select
             className="dropDown"
-            id={`${this.state.incomeOrExpense}AddItemFrequency`}
-            onChange={() => this.handleFrequencySelect()}
+            id={`${this.state.incomeOrExpense}itemFrequency`}
+            onChange={() => this.handleFrequencySelect(descriptionBeforeEdit)}
+            defaultValue={frequencyBeforeEdit}
           >
             <option value="One-time">One-time</option>
             <option value="Weekly">Weekly</option>
@@ -136,8 +156,10 @@ class AddItemRow extends React.Component {
         </td>
         <td>
           <DatePicker
-            id={`${this.state.incomeOrExpense}AddItemStartDate`}
+            id={`${this.state.incomeOrExpense}itemStartDate`}
             selected={this.state.startDateSelector}
+            // preSelection={startDateBeforeEdit}
+            // selected={startDateBeforeEdit}
             onChange={this.handleStartDateChange}
             showMonthDropdown
             showYearDropdown
@@ -146,16 +168,19 @@ class AddItemRow extends React.Component {
         </td>
         <td>
           <input
-            id={`${this.state.incomeOrExpense}AddItemEndDateExists`}
+            id={`${this.state.incomeOrExpense}itemEndDateExists`}
             type="checkbox"
             onClick={() => this.handleEndDateCheckBoxClick()}
             disabled={this.state.endDateExistsCheckBoxDisabled}
+            defaultChecked={endDateExistsBeforeEdit}
           />
         </td>
         <td>
           <DatePicker
-            id={`${this.state.incomeOrExpense}AddItemEndDate`}
+            id={`${this.state.incomeOrExpense}itemEndDate`}
             selected={this.state.endDateSelector}
+            // preSelection={endDateBeforeEdit}
+            // selected={endDateBeforeEdit}selected={endDateBeforeEdit}
             onChange={this.handleEndDateChange}
             showMonthDropdown
             showYearDropdown
@@ -167,11 +192,11 @@ class AddItemRow extends React.Component {
           <button
             type="submit"
             onClick={() => {
-              this.handleAddItem();
+              this.handleConfirmEdit();
             }}
             disabled={null}
           >
-            +
+            confirm
           </button>
         </td>
       </tr>
@@ -179,4 +204,4 @@ class AddItemRow extends React.Component {
   }
 }
 
-export default AddItemRow;
+export default EditItemRow;

@@ -10,9 +10,11 @@ class App extends React.Component {
   constructor(props) {
     super(props);
 
-    this.changeChartPeriod = this.changeChartPeriod.bind(this);
     this.handleSubmitItem = this.handleSubmitItem.bind(this);
     this.handleRemoveItem = this.handleRemoveItem.bind(this); //TODO: revisit
+    this.changeChartPeriod = this.changeChartPeriod.bind(this);
+    this.handleEditItem = this.handleEditItem.bind(this);
+    this.addEditedItem = this.addEditedItem.bind(this);
 
     this.state = {
       incomeItems: [],
@@ -26,7 +28,11 @@ class App extends React.Component {
       incomeTotal: 0,
       expenseTotal: 0,
       incomeItemKey: 0,
-      expenseItemKey: 0
+      expenseItemKey: 0,
+      incomeEditKey: null,
+      expenseEditKey: null,
+      editItemEndDateCheckBoxDisabled: null,
+      editItemEndDateExists: null
     };
   }
 
@@ -36,6 +42,78 @@ class App extends React.Component {
     for (let key in storedState) {
       let value = storedState[key];
       this.setState({ [key]: value });
+    }
+  }
+
+  handleEditItem(item) {
+    if (item.incomeOrExpense === "Income") {
+      this.setState({
+        incomeEditKey: item.key,
+        editItemEndDateCheckBoxDisabled:
+          item.frequency === "One-time" ? true : false,
+        editItemEndDateExists: item.endDateExists
+      });
+    } else {
+      this.setState({
+        expenseEditKey: item.key,
+        editItemEndDateCheckBoxDisabled:
+          item.frequency === "One-time" ? true : false,
+        editItemEndDateExists: item.endDateExists
+      });
+    }
+  }
+
+  addEditedItem(item) {
+    let incomeItems = this.state.incomeItems;
+    let expenseItems = this.state.expenseItems;
+    let arrayOfAllItems;
+
+    const editedItem = {
+      amount: item.amount,
+      description: item.description,
+      endDateExists: item.endDateExists,
+      frequency: item.frequency,
+      incomeOrExpense: item.incomeOrExpense,
+      startDate: item.startDate,
+      key: item.editKey,
+      endDate:
+        item.endDateExists || item.frequency !== "One-time"
+          ? item.endDate
+          : null
+    };
+
+    if (item.incomeOrExpense === "Income") {
+      const incomeItemEditIndex = incomeItems.findIndex(
+        i => i.key === item.editKey
+      );
+
+      incomeItems[incomeItemEditIndex] = editedItem;
+
+      arrayOfAllItems = incomeItems.concat(expenseItems);
+
+      this.setState(
+        {
+          incomeEditKey: null,
+          incomeItems: incomeItems,
+          arrayOfAllItems: arrayOfAllItems
+        },
+        () => this.updateLineChartArrays()
+      );
+    } else {
+      const expenseItemEditIndex = expenseItems.findIndex(
+        i => i.key === item.editKey
+      );
+      expenseItems[expenseItemEditIndex] = editedItem;
+      arrayOfAllItems = incomeItems.concat(expenseItems);
+
+      this.setState(
+        {
+          expenseEditKey: null,
+          expenseItems: expenseItems,
+          arrayOfAllItems: arrayOfAllItems
+        },
+        () => this.updateLineChartArrays()
+      );
     }
   }
 
@@ -129,7 +207,7 @@ class App extends React.Component {
         {
           label: "Balance",
           fill: false,
-          lineTension: 0.3,
+          lineTension: 0.2,
           backgroundColor: "rgba(255,61,61,0.4)",
           borderColor: "rgba(255,61,61,.8)",
           borderCapStyle: "butt",
@@ -244,11 +322,13 @@ class App extends React.Component {
     let amount;
     let incomeOrExpense = item.incomeOrExpense === "Income" ? 1 : -1;
     let emptyArray = new Array(this.state.chartPeriod).fill(0);
-    const firstDayOfChartPeriod = accountBalanceArray[0].date;
+    const firstDayOfChartPeriod = accountBalanceArray[0]
+      ? accountBalanceArray[0].date
+      : null;
     const lastDayOfChartPeriod = accountBalanceArray[this.state.chartPeriod - 1]
       ? accountBalanceArray[this.state.chartPeriod - 1].date
       : null;
-    const startDateOfItem = Date.parse(item.startOrOccuranceDate);
+    const startDateOfItem = Date.parse(item.startDate);
 
     if (item.frequency === "One-time") {
       interval = 0;
@@ -268,7 +348,7 @@ class App extends React.Component {
     }
 
     let startDateIndex = accountBalanceArray.findIndex(
-      i => i.date === this.roundToInterval(item.startOrOccuranceDate)
+      i => i.date === this.roundToInterval(item.startDate)
     );
 
     if (startDateIndex === -1) {
@@ -360,10 +440,10 @@ class App extends React.Component {
   }
 
   // FUNCTION THAT WILL ROUND THE INPUT TIME TO THE NEAREST INTERVAL SET BY createGraphPoints()
-  roundToInterval(startOrOccuranceDate) {
+  roundToInterval(startDate) {
     const startBalanceDate = Date.parse(this.state.startBalance.startingDate);
     return (
-      Math.round(Date.parse(startOrOccuranceDate) / 1209600000) * 1209600000 -
+      Math.round(Date.parse(startDate) / 1209600000) * 1209600000 -
       (Math.round(startBalanceDate / 1209600000) * 1209600000 -
         startBalanceDate)
     );
@@ -375,7 +455,7 @@ class App extends React.Component {
       description: item.description,
       amount: item.amount === "" ? 0 : parseInt(item.amount, 10),
       frequency: item.frequency,
-      startOrOccuranceDate: item.startDate,
+      startDate: item.startDate,
       endDateExists: item.endDateExists,
       endDate: item.endDate,
       incomeOrExpense: item.incomeOrExpense,
@@ -466,7 +546,11 @@ class App extends React.Component {
         incomeTotal: 0,
         expenseTotal: 0,
         incomeItemKey: 0,
-        expenseItemKey: 0
+        expenseItemKey: 0,
+        incomeEditKey: null,
+        expenseEditKey: null,
+        editItemEndDateCheckBoxDisabled: null,
+        editItemEndDateExists: null
       },
       () => {
         this.updateLineChartArrays();
@@ -585,6 +669,13 @@ class App extends React.Component {
               handleRemoveItem={this.handleRemoveItem}
               incomeOrExpense="Income"
               addItemKey={this.state.incomeItemKey}
+              handleEditItem={this.handleEditItem}
+              editKey={this.state.incomeEditKey}
+              addEditedItem={this.addEditedItem}
+              editItemEndDateCheckBoxDisabled={
+                this.state.editItemEndDateCheckBoxDisabled
+              }
+              editItemEndDateExists={this.state.editItemEndDateExists}
             />
           </div>
           <div className="expenseTable">
@@ -595,6 +686,13 @@ class App extends React.Component {
               handleRemoveItem={this.handleRemoveItem}
               incomeOrExpense="Expense"
               addItemKey={this.state.expenseItemKey}
+              addEditedItem={this.addEditedItem}
+              handleEditItem={this.handleEditItem}
+              editKey={this.state.expenseEditKey}
+              editItemEndDateCheckBoxDisabled={
+                this.state.editItemEndDateCheckBoxDisabled
+              }
+              editItemEndDateExists={this.state.editItemEndDateExists}
             />
           </div>
           <div>
