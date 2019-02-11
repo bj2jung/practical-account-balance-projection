@@ -2,23 +2,32 @@ import React from "react";
 import DatePicker from "react-datepicker";
 import moment from "moment";
 import "react-datepicker/dist/react-datepicker.css";
+import confirmButton from "../images/confirm_icon.png";
 
 class EditItemRow extends React.Component {
   constructor(props) {
     super(props);
+    const detailsBeforeEdit = this.props.detailsBeforeEdit;
+
     this.state = {
-      startDateSelector: moment(),
-      endDateSelector: moment(),
-      description: null,
-      amount: null,
-      frequency: null,
-      endDateExistsCheckBoxDisabled: this.props
-        .editIncomeItemEndDateCheckBoxDisabled,
-      endDateExists: this.props.editItemEndDateExists,
-      startDate: null,
-      endDate: null,
+      startDateSelector: moment(new Date(detailsBeforeEdit.startDate)),
+      endDateSelector: moment(new Date(detailsBeforeEdit.endDate)),
+      description: detailsBeforeEdit.description,
+      amount: detailsBeforeEdit.amount,
+      frequency: detailsBeforeEdit.frequency,
+      endDateExistsCheckBoxDisabled:
+        detailsBeforeEdit.frequency === "One-time" ? true : false,
+      endDateExists: detailsBeforeEdit
+        ? detailsBeforeEdit.endDateExists
+        : false,
+      endDateSelectorDisabled:
+        detailsBeforeEdit.frequency === "One-time" ||
+        !detailsBeforeEdit.endDateExists
+          ? true
+          : false,
       incomeOrExpense: this.props.incomeOrExpense
     };
+
     this.handleStartDateChange = this.handleStartDateChange.bind(this);
     this.handleEndDateChange = this.handleEndDateChange.bind(this);
   }
@@ -37,167 +46,157 @@ class EditItemRow extends React.Component {
 
   handleEndDateCheckBoxClick() {
     const itemEndDateExists = document.querySelector(
-      `#${this.state.incomeOrExpense}itemEndDateExists`
+      `#${this.state.incomeOrExpense}EditItemEndDateExists`
     ).checked;
+    const itemFrequency = document.querySelector(
+      `#${this.state.incomeOrExpense}EditItemFrequency`
+    ).value;
 
     this.setState({
-      endDateExists: itemEndDateExists ? true : false
+      endDateExists: itemEndDateExists ? true : false,
+      endDateSelectorDisabled:
+        itemFrequency === "One-time" || !itemEndDateExists ? true : false
     });
   }
 
-  handleFrequencySelect(descriptionBeforeEdit) {
+  handleFrequencySelect() {
     const itemFrequency = document.querySelector(
-      `#${this.state.incomeOrExpense}itemFrequency`
+      `#${this.state.incomeOrExpense}EditItemFrequency`
     ).value;
     const itemEndDateExists = document.querySelector(
-      `#${this.state.incomeOrExpense}itemEndDateExists`
+      `#${this.state.incomeOrExpense}EditItemEndDateExists`
     ).checked;
 
     this.setState({
       endDateExistsCheckBoxDisabled:
         itemFrequency === "One-time" ? true : false,
-      endDateExists:
-        itemFrequency === "One-time" || !itemEndDateExists ? false : true
+      endDateExists: itemEndDateExists ? true : false,
+      endDateSelectorDisabled:
+        itemFrequency === "One-time" || !itemEndDateExists ? true : false
     });
   }
 
   handleConfirmEdit() {
     const itemDescription = document.querySelector(
-      `#${this.state.incomeOrExpense}itemDescription`
+      `#${this.state.incomeOrExpense}EditItemDescription`
     );
     const itemAmount = document.querySelector(
-      `#${this.state.incomeOrExpense}itemAmount`
+      `#${this.state.incomeOrExpense}EditItemAmount`
     );
     const itemFrequency = document.querySelector(
-      `#${this.state.incomeOrExpense}itemFrequency`
+      `#${this.state.incomeOrExpense}EditItemFrequency`
     ).value;
     const itemEndDateExists = document.querySelector(
-      `#${this.state.incomeOrExpense}itemEndDateExists`
+      `#${this.state.incomeOrExpense}EditItemEndDateExists`
     );
     const itemStartDate = document.querySelector(
-      `#${this.state.incomeOrExpense}itemStartDate`
+      `#${this.state.incomeOrExpense}EditItemStartDate`
     ).value;
-    const itemEndDate = itemEndDateExists
-      ? document.querySelector(`#${this.state.incomeOrExpense}itemEndDate`)
-          .value
-      : null;
+    const itemEndDate = document.querySelector(
+      `#${this.state.incomeOrExpense}EditItemEndDate`
+    ).value;
 
     this.setState(
       {
         description: itemDescription.value,
         amount: isNaN(itemAmount.value) ? 0 : itemAmount.value,
         frequency: itemFrequency,
-        endDateExists: itemEndDateExists.checked,
+        endDateExists:
+          !itemEndDateExists.checked || itemFrequency === "One-time"
+            ? false
+            : true,
         startDate: itemStartDate,
         endDate: itemEndDate,
         editKey: this.props.editKey
       },
       () => {
         this.props.addEditedItem(this.state);
-        // this.setState({ endDateExists: false });
       }
     );
-
-    // itemDescription.value = "";
-    // itemAmount.value = "";
-    // itemEndDateExists.checked = false;
   }
 
   render() {
-    const detailsBeforeEdit = this.props.detailsBeforeEdit;
-    const descriptionBeforeEdit = detailsBeforeEdit
-      ? detailsBeforeEdit.description
-      : "";
-    const amountBeforeEdit = detailsBeforeEdit ? detailsBeforeEdit.amount : "";
-    const frequencyBeforeEdit = detailsBeforeEdit
-      ? detailsBeforeEdit.frequency
-      : "";
-    // const startDateBeforeEdit = this.props.detailsBeforeEdit
-    //   ? moment(new Date(detailsBeforeEdit.startDate))
-    //   : this.state.startDateSelector;
-    const endDateExistsBeforeEdit = detailsBeforeEdit
-      ? detailsBeforeEdit.endDateExists
-      : false;
-    // const endDateBeforeEdit = this.props.detailsBeforeEdit
-    //   ? moment(new Date(detailsBeforeEdit.endDate))
-    //   : this.state.endDateSelector;
-
     return (
-      <tr>
-        <td>
-          <input
-            id={`${this.state.incomeOrExpense}itemDescription`}
-            type="text"
-            defaultValue={descriptionBeforeEdit}
-            placeholder="Add description"
-          />
+      <tr className="editItemRow">
+        <td className="column1">
+          <div className="centered">
+            <div className="group">
+              <input
+                id={`${this.state.incomeOrExpense}EditItemDescription`}
+                type="text"
+                defaultValue={this.state.description}
+                required="required"
+              />
+            </div>
+          </div>
         </td>
-        <td>
-          <input
-            id={`${this.state.incomeOrExpense}itemAmount`}
-            type="text"
-            placeholder="Add amount"
-            defaultValue={amountBeforeEdit}
-          />
+        <td className="column2">
+          <div className="group">
+            <input
+              id={`${this.state.incomeOrExpense}EditItemAmount`}
+              type="text"
+              required="required"
+              defaultValue={this.state.amount}
+            />
+          </div>
         </td>
-        <td>
-          <select
-            className="dropDown"
-            id={`${this.state.incomeOrExpense}itemFrequency`}
-            onChange={() => this.handleFrequencySelect(descriptionBeforeEdit)}
-            defaultValue={frequencyBeforeEdit}
-          >
-            <option value="One-time">One-time</option>
-            <option value="Weekly">Weekly</option>
-            <option value="Bi-weekly">Bi-weekly</option>
-            <option value="Monthly">Monthly</option>
-            <option value="Annually">Annually</option>
-          </select>
+        <td className="column3 dropDown">
+          <div className="select">
+            <select
+              name="slct"
+              className="dropDown"
+              id={`${this.state.incomeOrExpense}EditItemFrequency`}
+              onChange={() => this.handleFrequencySelect()}
+              defaultValue={this.state.frequency}
+            >
+              <option value="One-time">One-time</option>
+              <option value="Weekly">Weekly</option>
+              <option value="Bi-weekly">Bi-weekly</option>
+              <option value="Monthly">Monthly</option>
+              <option value="Annually">Annually</option>
+            </select>
+          </div>
         </td>
-        <td>
+        <td className="column4">
           <DatePicker
-            id={`${this.state.incomeOrExpense}itemStartDate`}
+            id={`${this.state.incomeOrExpense}EditItemStartDate`}
             selected={this.state.startDateSelector}
-            // preSelection={startDateBeforeEdit}
-            // selected={startDateBeforeEdit}
             onChange={this.handleStartDateChange}
             showMonthDropdown
             showYearDropdown
             dropdownMode="select"
           />
         </td>
-        <td>
+        <td className="column5">
           <input
-            id={`${this.state.incomeOrExpense}itemEndDateExists`}
+            id={`${this.state.incomeOrExpense}EditItemEndDateExists`}
             type="checkbox"
             onClick={() => this.handleEndDateCheckBoxClick()}
             disabled={this.state.endDateExistsCheckBoxDisabled}
-            defaultChecked={endDateExistsBeforeEdit}
+            defaultChecked={this.state.endDateExists}
           />
         </td>
-        <td>
+        <td className="column6">
           <DatePicker
-            id={`${this.state.incomeOrExpense}itemEndDate`}
+            id={`${this.state.incomeOrExpense}EditItemEndDate`}
             selected={this.state.endDateSelector}
-            // preSelection={endDateBeforeEdit}
-            // selected={endDateBeforeEdit}selected={endDateBeforeEdit}
             onChange={this.handleEndDateChange}
             showMonthDropdown
             showYearDropdown
             dropdownMode="select"
-            disabled={!this.state.endDateExists}
+            disabled={this.state.endDateSelectorDisabled}
           />
         </td>
-        <td>
-          <button
-            type="submit"
+        <td className="column7">
+          <input
+            id="confirmButton"
+            type="image"
+            alt="confirm"
+            src={confirmButton}
             onClick={() => {
               this.handleConfirmEdit();
             }}
-            disabled={null}
-          >
-            confirm
-          </button>
+          />
         </td>
       </tr>
     );

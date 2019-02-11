@@ -11,7 +11,7 @@ class App extends React.Component {
     super(props);
 
     this.handleSubmitItem = this.handleSubmitItem.bind(this);
-    this.handleRemoveItem = this.handleRemoveItem.bind(this); //TODO: revisit
+    this.handleRemoveItem = this.handleRemoveItem.bind(this);
     this.changeChartPeriod = this.changeChartPeriod.bind(this);
     this.handleEditItem = this.handleEditItem.bind(this);
     this.addEditedItem = this.addEditedItem.bind(this);
@@ -31,7 +31,6 @@ class App extends React.Component {
       expenseItemKey: 0,
       incomeEditKey: null,
       expenseEditKey: null,
-      editItemEndDateCheckBoxDisabled: null,
       editItemEndDateExists: null
     };
   }
@@ -49,15 +48,11 @@ class App extends React.Component {
     if (item.incomeOrExpense === "Income") {
       this.setState({
         incomeEditKey: item.key,
-        editItemEndDateCheckBoxDisabled:
-          item.frequency === "One-time" ? true : false,
         editItemEndDateExists: item.endDateExists
       });
     } else {
       this.setState({
         expenseEditKey: item.key,
-        editItemEndDateCheckBoxDisabled:
-          item.frequency === "One-time" ? true : false,
         editItemEndDateExists: item.endDateExists
       });
     }
@@ -76,10 +71,7 @@ class App extends React.Component {
       incomeOrExpense: item.incomeOrExpense,
       startDate: item.startDate,
       key: item.editKey,
-      endDate:
-        item.endDateExists || item.frequency !== "One-time"
-          ? item.endDate
-          : null
+      endDate: item.endDate
     };
 
     if (item.incomeOrExpense === "Income") {
@@ -88,7 +80,6 @@ class App extends React.Component {
       );
 
       incomeItems[incomeItemEditIndex] = editedItem;
-
       arrayOfAllItems = incomeItems.concat(expenseItems);
 
       this.setState(
@@ -672,10 +663,7 @@ class App extends React.Component {
               handleEditItem={this.handleEditItem}
               editKey={this.state.incomeEditKey}
               addEditedItem={this.addEditedItem}
-              editItemEndDateCheckBoxDisabled={
-                this.state.editItemEndDateCheckBoxDisabled
-              }
-              editItemEndDateExists={this.state.editItemEndDateExists}
+              handleMouseOver={this.handleMouseOver}
             />
           </div>
           <div className="expenseTable">
@@ -686,13 +674,10 @@ class App extends React.Component {
               handleRemoveItem={this.handleRemoveItem}
               incomeOrExpense="Expense"
               addItemKey={this.state.expenseItemKey}
-              addEditedItem={this.addEditedItem}
               handleEditItem={this.handleEditItem}
               editKey={this.state.expenseEditKey}
-              editItemEndDateCheckBoxDisabled={
-                this.state.editItemEndDateCheckBoxDisabled
-              }
-              editItemEndDateExists={this.state.editItemEndDateExists}
+              addEditedItem={this.addEditedItem}
+              handleMouseOver={this.handleMouseOver}
             />
           </div>
           <div>

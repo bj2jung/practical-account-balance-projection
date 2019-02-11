@@ -2,6 +2,7 @@ import React from "react";
 import DatePicker from "react-datepicker";
 import moment from "moment";
 import "react-datepicker/dist/react-datepicker.css";
+import addItemButton from "../images/add_icon.png";
 
 class AddItemRow extends React.Component {
   constructor(props) {
@@ -90,7 +91,7 @@ class AddItemRow extends React.Component {
         endDateExists:
           itemFrequency === "One-time" ? false : itemEndDateExists.checked,
         startDate: itemStartDate,
-        endDate: itemFrequency === "One-time" ? null : itemEndDate,
+        endDate: itemEndDate,
         key: addItemKey
       },
       () => {
@@ -106,35 +107,49 @@ class AddItemRow extends React.Component {
 
   render() {
     return (
-      <tr>
-        <td>
-          <input
-            id={`${this.state.incomeOrExpense}AddItemDescription`}
-            type="text"
-            placeholder="Add description"
-          />
+      <tr className="addItemRow">
+        <td className="column1">
+          <div className="centered">
+            <div className="group">
+              <input
+                id={`${this.state.incomeOrExpense}AddItemDescription`}
+                type="text"
+                className="name"
+                required="required"
+              />
+              <label for={`${this.state.incomeOrExpense}AddItemDescription`}>
+                Description
+              </label>
+            </div>
+          </div>
         </td>
-        <td>
-          <input
-            id={`${this.state.incomeOrExpense}AddItemAmount`}
-            type="text"
-            placeholder="Add amount"
-          />
+        <td className="column2">
+          <div className="group">
+            <input
+              id={`${this.state.incomeOrExpense}AddItemAmount`}
+              type="text"
+              required="required"
+            />
+            <label for={`${this.state.incomeOrExpense}AddItemAmount`}>$</label>
+          </div>
         </td>
-        <td>
-          <select
-            className="dropDown"
-            id={`${this.state.incomeOrExpense}AddItemFrequency`}
-            onChange={() => this.handleFrequencySelect()}
-          >
-            <option value="One-time">One-time</option>
-            <option value="Weekly">Weekly</option>
-            <option value="Bi-weekly">Bi-weekly</option>
-            <option value="Monthly">Monthly</option>
-            <option value="Annually">Annually</option>
-          </select>
+        <td className="column3 dropDown">
+          <div className="select">
+            <select
+              name="slct"
+              className="dropDown"
+              id={`${this.state.incomeOrExpense}AddItemFrequency`}
+              onChange={() => this.handleFrequencySelect()}
+            >
+              <option value="One-time">One-time</option>
+              <option value="Weekly">Weekly</option>
+              <option value="Bi-weekly">Bi-weekly</option>
+              <option value="Monthly">Monthly</option>
+              <option value="Annually">Annually</option>
+            </select>
+          </div>
         </td>
-        <td>
+        <td className="column4">
           <DatePicker
             id={`${this.state.incomeOrExpense}AddItemStartDate`}
             selected={this.state.startDateSelector}
@@ -144,15 +159,15 @@ class AddItemRow extends React.Component {
             dropdownMode="select"
           />
         </td>
-        <td>
+        <td className="column5">
           <input
-            id={`${this.state.incomeOrExpense}AddItemEndDateExists`}
             type="checkbox"
+            id={`${this.state.incomeOrExpense}AddItemEndDateExists`}
             onClick={() => this.handleEndDateCheckBoxClick()}
             disabled={this.state.endDateExistsCheckBoxDisabled}
           />
         </td>
-        <td>
+        <td className="column6">
           <DatePicker
             id={`${this.state.incomeOrExpense}AddItemEndDate`}
             selected={this.state.endDateSelector}
@@ -163,16 +178,16 @@ class AddItemRow extends React.Component {
             disabled={!this.state.endDateExists}
           />
         </td>
-        <td>
-          <button
-            type="submit"
+        <td className="column7">
+          <input
+            id="addItemButton"
+            type="image"
+            alt="+"
+            src={addItemButton}
             onClick={() => {
               this.handleAddItem();
             }}
-            disabled={null}
-          >
-            +
-          </button>
+          />
         </td>
       </tr>
     );

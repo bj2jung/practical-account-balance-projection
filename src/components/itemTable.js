@@ -2,10 +2,23 @@ import React from "react";
 import { Table } from "reactstrap";
 import AddItemRow from "./addItemRow.js";
 import EditItemRow from "./editItemRow.js";
+import editItemButton from "../images/edit_icon.png";
+import removeItemButton from "../images/remove_icon.png";
 
 class ItemTable extends React.Component {
   render() {
     const rows = [];
+    // const mouseOverIndex = this.props.items.findIndex(
+    //   i => i.key === this.props.mouseOverKey
+    // );
+    // let buttons = (
+    //   <div>
+    //     <button onClick={() => this.props.handleEditItem(this.item)}>e</button>
+    //     <button onClick={() => this.props.handleRemoveItem(this.item)}>
+    //       -
+    //     </button>
+    //   </div>
+    // );
 
     if (this.props.items.length > 0) {
       this.props.items.forEach(item => {
@@ -15,11 +28,25 @@ class ItemTable extends React.Component {
             key={item.key}
             handleRemoveItem={this.props.handleRemoveItem}
             handleEditItem={this.props.handleEditItem}
+            handleMouseOver={this.props.handleMouseOver}
           />
         );
       });
     }
-    /////////////////
+
+    // if (mouseOverIndex >= 0) {
+    //   rows[mouseOverIndex] = (
+    //     <ItemRow
+    //       item={this.props.items[0]}
+    //       key={this.props.items[0].key}
+    //       handleRemoveItem={this.props.handleRemoveItem}
+    //       handleEditItem={this.props.handleEditItem}
+    //       handleMouseOver={this.props.handleMouseOver}
+    //       buttons={buttons}
+    //     />
+    //   );
+    // }
+
     const editIndex = this.props.items.findIndex(
       i => i.key === this.props.editKey
     );
@@ -30,25 +57,17 @@ class ItemTable extends React.Component {
           editKey={this.props.editKey}
           incomeOrExpense={this.props.incomeOrExpense}
           addEditedItem={this.props.addEditedItem}
-          endDateSelectorDisabled={this.props.endDateSelectorDisabled}
           detailsBeforeEdit={this.props.items[editIndex]}
-          editIncomeItemEndDateCheckBoxDisabled={
-            this.props.editIncomeItemEndDateCheckBoxDisabled
-          }
-          editItemEndDateExists={this.props.editItemEndDateExists}
         />
       );
     }
-    ////////////////
 
     rows.push(
       <AddItemRow
         key="addItemRow"
         incomeOrExpense={this.props.incomeOrExpense}
         handleSubmitItem={this.props.handleSubmitItem}
-        endDateSelectorDisabled={this.props.endDateSelectorDisabled}
         addItemKey={this.props.addItemKey}
-        detailsBeforeEdit={null}
       />
     );
 
@@ -59,13 +78,13 @@ class ItemTable extends React.Component {
           <Table striped responsive>
             <thead>
               <tr>
-                <th className="col1">Description</th>
-                <th className="col2">Amount</th>
-                <th className="col3">Frequency</th>
-                <th className="col4">Start/Occurance</th>
-                <th className="col5" />
-                <th className="col6">End</th>
-                <th className="col7" />
+                <th className="column1">Description</th>
+                <th className="column2">Amount</th>
+                <th className="column3">Frequency</th>
+                <th className="column4">Start</th>
+                <th className="column5" />
+                <th className="column6">End</th>
+                <th className="column7" />
               </tr>
             </thead>
             <tbody className="tableBody">{rows}</tbody>
@@ -84,20 +103,31 @@ function ItemRow(props) {
   const startDate = props.item.startDate;
   const endDate = props.item.endDateExists ? props.item.endDate : "-";
   const item = props.item;
+  // const buttons = props.buttons;
 
   return (
-    <tr>
+    <tr onMouseOver={() => {}}>
       <td className="column1">{description}</td>
-      <td className="column2">{amount}</td>
+      <td className="column2">${amount}</td>
       <td className="column3">{frequency}</td>
       <td className="column4">{startDate}</td>
       <td className="column5" />
       <td className="column6">{endDate}</td>
       <td className="column7">
-        <button onClick={() => props.handleEditItem(item)}>edit</button>
-      </td>
-      <td className="column8">
-        <button onClick={() => props.handleRemoveItem(item)}>-</button>
+        <input
+          type="image"
+          alt="edit"
+          src={editItemButton}
+          className="editItemButton"
+          onClick={() => props.handleEditItem(item)}
+        />
+        <input
+          type="image"
+          alt="-"
+          src={removeItemButton}
+          className="removeItemButton"
+          onClick={() => props.handleRemoveItem(item)}
+        />
       </td>
     </tr>
   );

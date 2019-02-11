@@ -1,11 +1,13 @@
+@charset "UTF-8";
 body {
   padding: 30px;
-  margin-bottom: 100px !important;
+  margin-bottom: 100px;
+  font-size: 16px;
 }
 
 .App {
   text-align: center;
-  padding: 50;
+  padding: 50px;
 }
 
 .chartsDiv {
@@ -38,24 +40,260 @@ h1 {
   display: grid;
   grid-template-columns: 50% 50%;
 }
-.itemTableDiv .incomeTable,
-.itemTableDiv .expenseTable {
-  max-width: 890px;
+.itemTableDiv .addItemRow *,
+.itemTableDiv .editItemRow * {
+  box-sizing: border-box;
+}
+.itemTableDiv .addItemRow .centered,
+.itemTableDiv .editItemRow .centered {
+  width: 12em;
+  height: 2em;
+  margin: auto;
+  position: relative;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+}
+.itemTableDiv .addItemRow .group,
+.itemTableDiv .editItemRow .group {
+  width: 100%;
+  height: 2em;
+  overflow: hidden;
+  position: relative;
+}
+.itemTableDiv .addItemRow label,
+.itemTableDiv .editItemRow label {
+  position: absolute;
+  top: 0.25em;
+  color: #969696;
+  cursor: text;
+  transition: 0.25s ease;
+}
+.itemTableDiv .addItemRow input,
+.itemTableDiv .editItemRow input {
+  display: block;
+  width: 100%;
+  height: 2em;
+  border: solid 1px #f2f2f2;
+  border-radius: 0.5em;
+  color: black;
+  transition: 0.3s ease;
   margin: auto;
 }
-.itemTableDiv #IncomeitemAmount,
-.itemTableDiv #ExpenseitemAmount {
-  max-width: 80px;
+.itemTableDiv .addItemRow input:valid, .itemTableDiv .addItemRow input:focus,
+.itemTableDiv .editItemRow input:valid,
+.itemTableDiv .editItemRow input:focus {
+  outline: none;
 }
-
-.table-wrapper-scroll-y {
+.itemTableDiv .addItemRow input:valid ~ label, .itemTableDiv .addItemRow input:focus ~ label,
+.itemTableDiv .editItemRow input:valid ~ label,
+.itemTableDiv .editItemRow input:focus ~ label {
+  top: 0;
+  font: 700 0.48em Roboto;
+  color: #2196f3;
+}
+.itemTableDiv .addItemRow input:-webkit-autofill,
+.itemTableDiv .editItemRow input:-webkit-autofill {
+  -webkit-box-shadow: 0 0 0px 1000px white inset;
+  -webkit-text-fill-color: black !important;
+}
+.itemTableDiv .addItemRow ::selection,
+.itemTableDiv .editItemRow ::selection {
+  background: rgba(33, 150, 243, 0.3);
+}
+.itemTableDiv .addItemRow .column1,
+.itemTableDiv .editItemRow .column1 {
+  padding: 8px 0;
+}
+.itemTableDiv .addItemRow .column2,
+.itemTableDiv .editItemRow .column2 {
+  text-align: left;
+  padding: 8px 0;
+}
+.itemTableDiv .addItemRow .column2 input,
+.itemTableDiv .editItemRow .column2 input {
+  width: 5em;
+}
+.itemTableDiv .addItemRow .column1 label,
+.itemTableDiv .editItemRow .column1 label {
+  left: 0.5em;
+}
+.itemTableDiv .addItemRow .column2 label,
+.itemTableDiv .editItemRow .column2 label {
+  left: 1em;
+}
+.itemTableDiv .addItemRow .column3,
+.itemTableDiv .addItemRow .column4,
+.itemTableDiv .addItemRow .column6,
+.itemTableDiv .editItemRow .column3,
+.itemTableDiv .editItemRow .column4,
+.itemTableDiv .editItemRow .column6 {
+  padding: 0.5em;
+}
+.itemTableDiv .addItemRow .dropDown,
+.itemTableDiv .editItemRow .dropDown {
+  /* Reset Select */
+  /* Custom Select */
+  /* Arrow */
+  /* Transition */
+}
+.itemTableDiv .addItemRow .dropDown select,
+.itemTableDiv .editItemRow .dropDown select {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  -ms-appearance: none;
+  appearance: none;
+  outline: 0;
+  box-shadow: none;
+  border: solid 1px #f2f2f2;
+  background: #fff;
+  background-image: none;
+}
+.itemTableDiv .addItemRow .dropDown .select,
+.itemTableDiv .editItemRow .dropDown .select {
+  position: relative;
+  display: block;
+  width: 6.5em;
+  height: 2em;
+  overflow: hidden;
+  border-radius: 0.5em;
+  margin: auto;
+}
+.itemTableDiv .addItemRow .dropDown select,
+.itemTableDiv .editItemRow .dropDown select {
+  width: 100%;
+  height: 100%;
+  padding: 0 0.5em;
+  color: black;
+  cursor: pointer;
+}
+.itemTableDiv .addItemRow .dropDown select::-ms-expand,
+.itemTableDiv .editItemRow .dropDown select::-ms-expand {
+  display: none;
+}
+.itemTableDiv .addItemRow .dropDown .select::after,
+.itemTableDiv .editItemRow .dropDown .select::after {
+  content: "▼";
+  position: absolute;
+  top: 0.25em;
+  right: 0.5em;
+  bottom: 0;
+  padding: 0;
+  background: #fff;
+  pointer-events: none;
+}
+.itemTableDiv .addItemRow .dropDown .select:hover::after,
+.itemTableDiv .editItemRow .dropDown .select:hover::after {
+  color: #2196f3;
+}
+.itemTableDiv .addItemRow .dropDown .select::after,
+.itemTableDiv .editItemRow .dropDown .select::after {
+  -webkit-transition: 0.25s all ease;
+  -o-transition: 0.25s all ease;
+  transition: 0.25s all ease;
+}
+.itemTableDiv .addItemRow #IncomeEditItemEndDateExists,
+.itemTableDiv .addItemRow #IncomeAddItemEndDateExists,
+.itemTableDiv .addItemRow #ExpenseEditItemEndDateExists,
+.itemTableDiv .addItemRow #ExpenseAddItemEndDateExists,
+.itemTableDiv .editItemRow #IncomeEditItemEndDateExists,
+.itemTableDiv .editItemRow #IncomeAddItemEndDateExists,
+.itemTableDiv .editItemRow #ExpenseEditItemEndDateExists,
+.itemTableDiv .editItemRow #ExpenseAddItemEndDateExists {
+  width: 1em;
+  height: 1em;
+}
+.itemTableDiv .addItemRow .column5,
+.itemTableDiv .editItemRow .column5 {
+  padding: 1em 0em;
+}
+.itemTableDiv .addItemRow #addItemButton,
+.itemTableDiv .addItemRow #confirmButton,
+.itemTableDiv .editItemRow #addItemButton,
+.itemTableDiv .editItemRow #confirmButton {
+  border: none;
+  height: 2em;
+  width: 2em;
+  margin: 0.5em 0;
+}
+.itemTableDiv th {
+  height: 50px;
+}
+.itemTableDiv td {
+  height: 3em;
+}
+.itemTableDiv .editItemButton,
+.itemTableDiv .removeItemButton {
+  border: none;
+  height: 2em;
+  width: 2em;
+  margin: 0.5em 0;
+}
+.itemTableDiv .incomeTable,
+.itemTableDiv .expenseTable {
+  min-width: 50em;
+  max-width: 55em;
+  margin: auto;
+}
+.itemTableDiv .column1 {
+  width: 15em;
+}
+.itemTableDiv .column2 {
+  width: 5em;
+}
+.itemTableDiv .column3 {
+  width: 6em;
+}
+.itemTableDiv .column5 {
+  width: 2.5em;
+}
+.itemTableDiv .column4,
+.itemTableDiv .column6 {
+  width: 120px;
+}
+.itemTableDiv .column2,
+.itemTableDiv .column3,
+.itemTableDiv .column4,
+.itemTableDiv .column5,
+.itemTableDiv .column6,
+.itemTableDiv .column7 {
+  text-align: center;
+}
+.itemTableDiv .column7 {
+  display: grid;
+  grid-template-columns: 50% 50%;
+  padding: 0;
+  max-width: 4em;
+  margin-right: 0;
+}
+.itemTableDiv .editItemButton,
+.itemTableDiv .removeItemButton {
+  display: none;
+}
+.itemTableDiv tr:hover .editItemButton,
+.itemTableDiv tr:hover .removeItemButton {
+  display: inline;
+}
+.itemTableDiv #IncomeAddItemStartDate,
+.itemTableDiv #IncomeAddItemEndDate,
+.itemTableDiv #IncomeEditItemStartDate,
+.itemTableDiv #IncomeEditItemEndDate,
+.itemTableDiv #ExpenseAddItemStartDate,
+.itemTableDiv #ExpenseAddItemEndDate,
+.itemTableDiv #ExpenseEditItemStartDate,
+.itemTableDiv #ExpenseEditItemEndDate {
+  max-width: 6em;
+  padding: 0;
+  margin: auto;
+  font-size: 16px;
+  height: 2em;
+  text-align: center;
+}
+.itemTableDiv .table-wrapper-scroll-y {
   display: block;
   height: 380px;
   overflow-y: auto;
-}
-
-.dropDown {
-  height: 30px;
 }
 
 /*# sourceMappingURL=index.css.map */
