@@ -47,13 +47,11 @@ class App extends React.Component {
   handleEditItem(item) {
     if (item.incomeOrExpense === "Income") {
       this.setState({
-        incomeEditKey: item.key,
-        editItemEndDateExists: item.endDateExists
+        incomeEditKey: item.key
       });
     } else {
       this.setState({
-        expenseEditKey: item.key,
-        editItemEndDateExists: item.endDateExists
+        expenseEditKey: item.key
       });
     }
   }
@@ -510,8 +508,9 @@ class App extends React.Component {
 
     const startBalance = {
       startingDate: e.target[0].value,
-      startingBalance:
-        e.target[1].value === "" ? 0 : parseInt(e.target[1].value, 10)
+      startingBalance: isNaN(e.target[1].value)
+        ? 0
+        : parseInt(e.target[1].value, 10)
     };
 
     this.setState({ startBalance: startBalance }, () => {
@@ -552,9 +551,11 @@ class App extends React.Component {
   render() {
     return (
       <div>
-        <h1 className="App-header App-title">
-          Practical Account Balance Projection
-        </h1>
+        <header>
+          <h1 className="App-header App-title">
+            Practical Account Balance Projection
+          </h1>
+        </header>
         <div className="chartsDiv">
           <div className="lineChartDiv">
             <Line
@@ -583,75 +584,55 @@ class App extends React.Component {
               }}
             />
           </div>
-          <div className="incomePieChartDiv">
-            <Doughnut
-              className="pieChart"
-              data={this.updatePieChartInfo().incomePieChartData}
-              width={400}
-              height={500}
-              options={{
-                maintainAspectRatio: false,
-                title: {
-                  display: true,
-                  text: `Total Income: $${
-                    this.state.accumulatedIncomeArray[
-                      this.state.chartPeriod - 1
-                    ]
-                  }`,
-                  fontSize: 19
-                }
-              }}
-            />
-          </div>
-          <div className="expensePieChartDiv">
-            <Doughnut
-              className="pieChart"
-              data={this.updatePieChartInfo().expensePieChartData}
-              width={400}
-              height={500}
-              options={{
-                maintainAspectRatio: false,
-                title: {
-                  display: true,
-                  text: `Total Expense: $${-this.state.accumulatedExpenseArray[
-                    this.state.chartPeriod - 1
-                  ]}`,
-                  fontSize: 19
-                }
-              }}
-            />
-          </div>
-          <div>
-            <label>
-              <input
-                type="radio"
-                name="chartPeriod"
-                onChange={this.changeChartPeriod}
-                value={27}
+          <div className="pieChartsDiv">
+            <div className="incomePieChartDiv">
+              <Doughnut
+                className="pieChart"
+                data={this.updatePieChartInfo().incomePieChartData}
+                width={400}
+                height={500}
+                options={{
+                  maintainAspectRatio: false,
+                  title: {
+                    display: true,
+                    text: `Total Income: $${
+                      this.state.accumulatedIncomeArray[
+                        this.state.chartPeriod - 1
+                      ]
+                    }`,
+                    fontSize: 19
+                  }
+                }}
               />
-              1-Year
-            </label>
-            <label>
-              <input
-                type="radio"
-                name="chartPeriod"
-                onChange={this.changeChartPeriod}
-                value={53}
+            </div>
+            <div className="expensePieChartDiv">
+              <Doughnut
+                className="pieChart"
+                data={this.updatePieChartInfo().expensePieChartData}
+                width={400}
+                height={500}
+                options={{
+                  maintainAspectRatio: false,
+                  title: {
+                    display: true,
+                    text: `Total Expense: $${-this.state
+                      .accumulatedExpenseArray[this.state.chartPeriod - 1]}`,
+                    fontSize: 19
+                  }
+                }}
               />
-              2-Year
-            </label>
-            <label>
-              <input
-                type="radio"
-                name="chartPeriod"
-                onChange={this.changeChartPeriod}
-                value={131}
-              />
-              5-Year
-            </label>
+            </div>
           </div>
         </div>
-        <div className="itemTableDiv">
+        {/* end chartsDiv */}
+
+        <StartingBalanceBox
+          handleSubmitStartingBalance={this.handleSubmitStartingBalance}
+          changeChartPeriod={this.changeChartPeriod}
+          resetData={this.resetData}
+        />
+
+        <div className="itemTablesDiv">
           <div className="incomeTable">
             <ItemTable
               title="Income"
@@ -680,13 +661,7 @@ class App extends React.Component {
               handleMouseOver={this.handleMouseOver}
             />
           </div>
-          <div>
-            <StartingBalanceBox
-              handleSubmitStartingBalance={this.handleSubmitStartingBalance}
-            />
-          </div>
         </div>
-        <button onClick={this.resetData}>Reset Data</button>
       </div>
     );
   }

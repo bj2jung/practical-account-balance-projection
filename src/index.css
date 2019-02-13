@@ -1,51 +1,88 @@
 @charset "UTF-8";
 body {
-  padding: 30px;
-  margin-bottom: 100px;
+  padding: 2em 2em 10em 2em;
   font-size: 16px;
 }
-
-.App {
-  text-align: center;
-  padding: 50px;
-}
-
-.chartsDiv {
+body header {
   display: grid;
-  grid-template-columns: 50% 25% 25%;
-  height: 600px;
-  box-sizing: border-box;
 }
-.chartsDiv .lineChartDiv {
+body header h1 {
+  padding-bottom: 1em;
+}
+body .chartsDiv {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(750px, 1fr));
+  grid-gap: 1em;
+}
+body .chartsDiv .lineChartDiv {
   width: 90%;
   margin: auto;
   min-width: 670px;
 }
-.chartsDiv .incomePieChartDiv {
-  width: 90%;
-  margin: auto;
-  min-width: 335px;
-}
-.chartsDiv .expensePieChartDiv {
-  width: 90%;
-  margin: auto;
-  min-width: 335px;
-}
-
-h1 {
-  padding-bottom: 50px;
-}
-
-.itemTableDiv {
+body .chartsDiv .pieChartsDiv {
   display: grid;
-  grid-template-columns: 50% 50%;
+  grid-template-columns: 1fr 1fr;
+  grid-gap: 0.5em;
 }
-.itemTableDiv .addItemRow *,
-.itemTableDiv .editItemRow * {
+body .chartsDiv .pieChartsDiv .incomePieChartDiv {
+  width: 90%;
+  margin: auto;
+  min-width: 335px;
+}
+body .chartsDiv .pieChartsDiv .expensePieChartDiv {
+  width: 90%;
+  margin: auto;
+  min-width: 335px;
+}
+body .optionsDiv {
+  margin-top: 2em;
+}
+body .optionsDiv .optionsDivHeader {
+  width: 50rem;
+  margin: auto;
+  margin-bottom: 0.5rem;
+}
+body .optionsDiv .optionsDivContent {
+  display: grid;
+  grid-template-columns: 3fr 2fr 1fr;
+  grid-column-gap: 1em;
+  border: solid 2px #f2f2f2;
+  margin: 0em auto 2em auto;
+  justify-items: center;
+  justify-content: center;
+  align-items: top;
+  width: 50em;
+}
+body .optionsDiv .optionsDivContent #optionsDateSelector {
+  max-width: 6em;
+  padding: 0;
+  margin: auto;
+  font-size: 16px;
+  height: 2em;
+  text-align: center;
+  border-radius: 0.5em;
+}
+body .optionsDiv .optionsDivContent #updateStartingBalance,
+body .optionsDiv .optionsDivContent #resetButton {
+  width: 2em;
+  height: 2em;
+}
+body .optionsDiv .optionsDivContent .periodRadioOption {
+  margin: 0;
+}
+body .optionsDiv .optionsDivContent form {
+  display: grid;
+  grid-template-columns: 1fr 2fr 1fr;
+  align-items: center;
+}
+body .optionsDiv .optionsDivContent form * {
   box-sizing: border-box;
 }
-.itemTableDiv .addItemRow .centered,
-.itemTableDiv .editItemRow .centered {
+body .optionsDiv .optionsDivContent form .optionsDateSelectorDiv {
+  grid-column: 1/2;
+}
+body .optionsDiv .optionsDivContent form .centered {
+  grid-column: 2/3;
   width: 12em;
   height: 2em;
   margin: auto;
@@ -55,23 +92,92 @@ h1 {
   left: 0;
   right: 0;
 }
-.itemTableDiv .addItemRow .group,
-.itemTableDiv .editItemRow .group {
+body .optionsDiv .optionsDivContent form .group {
   width: 100%;
   height: 2em;
   overflow: hidden;
   position: relative;
 }
-.itemTableDiv .addItemRow label,
-.itemTableDiv .editItemRow label {
+body .optionsDiv .optionsDivContent form label {
+  position: absolute;
+  top: 0.25em;
+  left: 0.5em;
+  color: #969696;
+  cursor: text;
+  transition: 0.25s ease;
+}
+body .optionsDiv .optionsDivContent form input {
+  display: inline-block;
+  width: 100%;
+  height: 2em;
+  border: solid 1px #f2f2f2;
+  border-radius: 0.5em;
+  color: black;
+  transition: 0.3s ease;
+  margin: auto;
+}
+body .optionsDiv .optionsDivContent form input:valid, body .optionsDiv .optionsDivContent form input:focus {
+  outline: none;
+}
+body .optionsDiv .optionsDivContent form input:valid ~ label, body .optionsDiv .optionsDivContent form input:focus ~ label {
+  top: 0;
+  font: 700 0.48em Roboto;
+  color: #2196f3;
+}
+body .optionsDiv .optionsDivContent form input:-webkit-autofill {
+  -webkit-box-shadow: 0 0 0px 1000px white inset;
+  -webkit-text-fill-color: black !important;
+}
+body .optionsDiv .optionsDivContent form #updateStartingBalance {
+  border: none;
+}
+body .optionsDiv .optionsDivContent form ::selection {
+  background: rgba(33, 150, 243, 0.3);
+}
+body .optionsDiv .optionsDivContent .periodSelectDiv {
+  display: grid;
+  grid-template-columns: 2fr 3fr 2fr;
+  justify-items: center;
+  align-items: center;
+}
+body .itemTablesDiv {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(825px, 1fr));
+  grid-gap: 1em;
+  justify-items: center;
+}
+body .itemTablesDiv .addItemRow *,
+body .itemTablesDiv .editItemRow * {
+  box-sizing: border-box;
+}
+body .itemTablesDiv .addItemRow .centered,
+body .itemTablesDiv .editItemRow .centered {
+  width: 12em;
+  height: 2em;
+  margin: auto;
+  position: relative;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+}
+body .itemTablesDiv .addItemRow .group,
+body .itemTablesDiv .editItemRow .group {
+  width: 100%;
+  height: 2em;
+  overflow: hidden;
+  position: relative;
+}
+body .itemTablesDiv .addItemRow label,
+body .itemTablesDiv .editItemRow label {
   position: absolute;
   top: 0.25em;
   color: #969696;
   cursor: text;
   transition: 0.25s ease;
 }
-.itemTableDiv .addItemRow input,
-.itemTableDiv .editItemRow input {
+body .itemTablesDiv .addItemRow input,
+body .itemTablesDiv .editItemRow input {
   display: block;
   width: 100%;
   height: 2em;
@@ -81,65 +187,65 @@ h1 {
   transition: 0.3s ease;
   margin: auto;
 }
-.itemTableDiv .addItemRow input:valid, .itemTableDiv .addItemRow input:focus,
-.itemTableDiv .editItemRow input:valid,
-.itemTableDiv .editItemRow input:focus {
+body .itemTablesDiv .addItemRow input:valid, body .itemTablesDiv .addItemRow input:focus,
+body .itemTablesDiv .editItemRow input:valid,
+body .itemTablesDiv .editItemRow input:focus {
   outline: none;
 }
-.itemTableDiv .addItemRow input:valid ~ label, .itemTableDiv .addItemRow input:focus ~ label,
-.itemTableDiv .editItemRow input:valid ~ label,
-.itemTableDiv .editItemRow input:focus ~ label {
+body .itemTablesDiv .addItemRow input:valid ~ label, body .itemTablesDiv .addItemRow input:focus ~ label,
+body .itemTablesDiv .editItemRow input:valid ~ label,
+body .itemTablesDiv .editItemRow input:focus ~ label {
   top: 0;
   font: 700 0.48em Roboto;
   color: #2196f3;
 }
-.itemTableDiv .addItemRow input:-webkit-autofill,
-.itemTableDiv .editItemRow input:-webkit-autofill {
+body .itemTablesDiv .addItemRow input:-webkit-autofill,
+body .itemTablesDiv .editItemRow input:-webkit-autofill {
   -webkit-box-shadow: 0 0 0px 1000px white inset;
   -webkit-text-fill-color: black !important;
 }
-.itemTableDiv .addItemRow ::selection,
-.itemTableDiv .editItemRow ::selection {
+body .itemTablesDiv .addItemRow ::selection,
+body .itemTablesDiv .editItemRow ::selection {
   background: rgba(33, 150, 243, 0.3);
 }
-.itemTableDiv .addItemRow .column1,
-.itemTableDiv .editItemRow .column1 {
+body .itemTablesDiv .addItemRow .column1,
+body .itemTablesDiv .editItemRow .column1 {
   padding: 8px 0;
 }
-.itemTableDiv .addItemRow .column2,
-.itemTableDiv .editItemRow .column2 {
+body .itemTablesDiv .addItemRow .column2,
+body .itemTablesDiv .editItemRow .column2 {
   text-align: left;
   padding: 8px 0;
 }
-.itemTableDiv .addItemRow .column2 input,
-.itemTableDiv .editItemRow .column2 input {
+body .itemTablesDiv .addItemRow .column2 input,
+body .itemTablesDiv .editItemRow .column2 input {
   width: 5em;
 }
-.itemTableDiv .addItemRow .column1 label,
-.itemTableDiv .editItemRow .column1 label {
+body .itemTablesDiv .addItemRow .column1 label,
+body .itemTablesDiv .editItemRow .column1 label {
   left: 0.5em;
 }
-.itemTableDiv .addItemRow .column2 label,
-.itemTableDiv .editItemRow .column2 label {
-  left: 1em;
+body .itemTablesDiv .addItemRow .column2 label,
+body .itemTablesDiv .editItemRow .column2 label {
+  left: 0.5em;
 }
-.itemTableDiv .addItemRow .column3,
-.itemTableDiv .addItemRow .column4,
-.itemTableDiv .addItemRow .column6,
-.itemTableDiv .editItemRow .column3,
-.itemTableDiv .editItemRow .column4,
-.itemTableDiv .editItemRow .column6 {
+body .itemTablesDiv .addItemRow .column3,
+body .itemTablesDiv .addItemRow .column4,
+body .itemTablesDiv .addItemRow .column6,
+body .itemTablesDiv .editItemRow .column3,
+body .itemTablesDiv .editItemRow .column4,
+body .itemTablesDiv .editItemRow .column6 {
   padding: 0.5em;
 }
-.itemTableDiv .addItemRow .dropDown,
-.itemTableDiv .editItemRow .dropDown {
+body .itemTablesDiv .addItemRow .dropDown,
+body .itemTablesDiv .editItemRow .dropDown {
   /* Reset Select */
   /* Custom Select */
   /* Arrow */
   /* Transition */
 }
-.itemTableDiv .addItemRow .dropDown select,
-.itemTableDiv .editItemRow .dropDown select {
+body .itemTablesDiv .addItemRow .dropDown select,
+body .itemTablesDiv .editItemRow .dropDown select {
   -webkit-appearance: none;
   -moz-appearance: none;
   -ms-appearance: none;
@@ -150,8 +256,8 @@ h1 {
   background: #fff;
   background-image: none;
 }
-.itemTableDiv .addItemRow .dropDown .select,
-.itemTableDiv .editItemRow .dropDown .select {
+body .itemTablesDiv .addItemRow .dropDown .select,
+body .itemTablesDiv .editItemRow .dropDown .select {
   position: relative;
   display: block;
   width: 6.5em;
@@ -160,20 +266,20 @@ h1 {
   border-radius: 0.5em;
   margin: auto;
 }
-.itemTableDiv .addItemRow .dropDown select,
-.itemTableDiv .editItemRow .dropDown select {
+body .itemTablesDiv .addItemRow .dropDown select,
+body .itemTablesDiv .editItemRow .dropDown select {
   width: 100%;
   height: 100%;
   padding: 0 0.5em;
   color: black;
   cursor: pointer;
 }
-.itemTableDiv .addItemRow .dropDown select::-ms-expand,
-.itemTableDiv .editItemRow .dropDown select::-ms-expand {
+body .itemTablesDiv .addItemRow .dropDown select::-ms-expand,
+body .itemTablesDiv .editItemRow .dropDown select::-ms-expand {
   display: none;
 }
-.itemTableDiv .addItemRow .dropDown .select::after,
-.itemTableDiv .editItemRow .dropDown .select::after {
+body .itemTablesDiv .addItemRow .dropDown .select::after,
+body .itemTablesDiv .editItemRow .dropDown .select::after {
   content: "▼";
   position: absolute;
   top: 0.25em;
@@ -183,106 +289,105 @@ h1 {
   background: #fff;
   pointer-events: none;
 }
-.itemTableDiv .addItemRow .dropDown .select:hover::after,
-.itemTableDiv .editItemRow .dropDown .select:hover::after {
+body .itemTablesDiv .addItemRow .dropDown .select:hover::after,
+body .itemTablesDiv .editItemRow .dropDown .select:hover::after {
   color: #2196f3;
 }
-.itemTableDiv .addItemRow .dropDown .select::after,
-.itemTableDiv .editItemRow .dropDown .select::after {
+body .itemTablesDiv .addItemRow .dropDown .select::after,
+body .itemTablesDiv .editItemRow .dropDown .select::after {
   -webkit-transition: 0.25s all ease;
   -o-transition: 0.25s all ease;
   transition: 0.25s all ease;
 }
-.itemTableDiv .addItemRow #IncomeEditItemEndDateExists,
-.itemTableDiv .addItemRow #IncomeAddItemEndDateExists,
-.itemTableDiv .addItemRow #ExpenseEditItemEndDateExists,
-.itemTableDiv .addItemRow #ExpenseAddItemEndDateExists,
-.itemTableDiv .editItemRow #IncomeEditItemEndDateExists,
-.itemTableDiv .editItemRow #IncomeAddItemEndDateExists,
-.itemTableDiv .editItemRow #ExpenseEditItemEndDateExists,
-.itemTableDiv .editItemRow #ExpenseAddItemEndDateExists {
+body .itemTablesDiv .addItemRow #IncomeEditItemEndDateExists,
+body .itemTablesDiv .addItemRow #IncomeAddItemEndDateExists,
+body .itemTablesDiv .addItemRow #ExpenseEditItemEndDateExists,
+body .itemTablesDiv .addItemRow #ExpenseAddItemEndDateExists,
+body .itemTablesDiv .editItemRow #IncomeEditItemEndDateExists,
+body .itemTablesDiv .editItemRow #IncomeAddItemEndDateExists,
+body .itemTablesDiv .editItemRow #ExpenseEditItemEndDateExists,
+body .itemTablesDiv .editItemRow #ExpenseAddItemEndDateExists {
   width: 1em;
   height: 1em;
 }
-.itemTableDiv .addItemRow .column5,
-.itemTableDiv .editItemRow .column5 {
+body .itemTablesDiv .addItemRow .column5,
+body .itemTablesDiv .editItemRow .column5 {
   padding: 1em 0em;
 }
-.itemTableDiv .addItemRow #addItemButton,
-.itemTableDiv .addItemRow #confirmButton,
-.itemTableDiv .editItemRow #addItemButton,
-.itemTableDiv .editItemRow #confirmButton {
+body .itemTablesDiv .addItemRow #addItemButton,
+body .itemTablesDiv .addItemRow #confirmButton,
+body .itemTablesDiv .editItemRow #addItemButton,
+body .itemTablesDiv .editItemRow #confirmButton {
   border: none;
   height: 2em;
   width: 2em;
   margin: 0.5em 0;
 }
-.itemTableDiv th {
+body .itemTablesDiv th {
   height: 50px;
 }
-.itemTableDiv td {
+body .itemTablesDiv td {
   height: 3em;
 }
-.itemTableDiv .editItemButton,
-.itemTableDiv .removeItemButton {
+body .itemTablesDiv .editItemButton,
+body .itemTablesDiv .removeItemButton {
   border: none;
   height: 2em;
   width: 2em;
   margin: 0.5em 0;
 }
-.itemTableDiv .incomeTable,
-.itemTableDiv .expenseTable {
+body .itemTablesDiv .incomeTable,
+body .itemTablesDiv .expenseTable {
+  max-width: 100%;
   min-width: 50em;
-  max-width: 55em;
-  margin: auto;
 }
-.itemTableDiv .column1 {
-  width: 15em;
+body .itemTablesDiv .column1 {
+  width: 14em;
 }
-.itemTableDiv .column2 {
+body .itemTablesDiv .column2 {
   width: 5em;
 }
-.itemTableDiv .column3 {
+body .itemTablesDiv .column3 {
   width: 6em;
 }
-.itemTableDiv .column5 {
+body .itemTablesDiv .column5 {
   width: 2.5em;
 }
-.itemTableDiv .column4,
-.itemTableDiv .column6 {
+body .itemTablesDiv .column4,
+body .itemTablesDiv .column6 {
   width: 120px;
 }
-.itemTableDiv .column2,
-.itemTableDiv .column3,
-.itemTableDiv .column4,
-.itemTableDiv .column5,
-.itemTableDiv .column6,
-.itemTableDiv .column7 {
+body .itemTablesDiv .column2,
+body .itemTablesDiv .column3,
+body .itemTablesDiv .column4,
+body .itemTablesDiv .column5,
+body .itemTablesDiv .column6,
+body .itemTablesDiv .column7 {
   text-align: center;
 }
-.itemTableDiv .column7 {
+body .itemTablesDiv .column7 {
   display: grid;
   grid-template-columns: 50% 50%;
   padding: 0;
   max-width: 4em;
   margin-right: 0;
 }
-.itemTableDiv .editItemButton,
-.itemTableDiv .removeItemButton {
+body .itemTablesDiv .editItemButton,
+body .itemTablesDiv .removeItemButton {
   display: none;
 }
-.itemTableDiv tr:hover .editItemButton,
-.itemTableDiv tr:hover .removeItemButton {
+body .itemTablesDiv tr:hover .editItemButton,
+body .itemTablesDiv tr:hover .removeItemButton {
   display: inline;
 }
-.itemTableDiv #IncomeAddItemStartDate,
-.itemTableDiv #IncomeAddItemEndDate,
-.itemTableDiv #IncomeEditItemStartDate,
-.itemTableDiv #IncomeEditItemEndDate,
-.itemTableDiv #ExpenseAddItemStartDate,
-.itemTableDiv #ExpenseAddItemEndDate,
-.itemTableDiv #ExpenseEditItemStartDate,
-.itemTableDiv #ExpenseEditItemEndDate {
+body .itemTablesDiv #IncomeAddItemStartDate,
+body .itemTablesDiv #IncomeAddItemEndDate,
+body .itemTablesDiv #IncomeEditItemStartDate,
+body .itemTablesDiv #IncomeEditItemEndDate,
+body .itemTablesDiv #ExpenseAddItemStartDate,
+body .itemTablesDiv #ExpenseAddItemEndDate,
+body .itemTablesDiv #ExpenseEditItemStartDate,
+body .itemTablesDiv #ExpenseEditItemEndDate {
   max-width: 6em;
   padding: 0;
   margin: auto;
@@ -290,7 +395,7 @@ h1 {
   height: 2em;
   text-align: center;
 }
-.itemTableDiv .table-wrapper-scroll-y {
+body .itemTablesDiv .table-wrapper-scroll-y {
   display: block;
   height: 380px;
   overflow-y: auto;

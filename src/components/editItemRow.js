@@ -15,6 +15,7 @@ class EditItemRow extends React.Component {
       description: detailsBeforeEdit.description,
       amount: detailsBeforeEdit.amount,
       frequency: detailsBeforeEdit.frequency,
+      // editKey: this.props.editKey,
       endDateExistsCheckBoxDisabled:
         detailsBeforeEdit.frequency === "One-time" ? true : false,
       endDateExists: detailsBeforeEdit
@@ -30,7 +31,44 @@ class EditItemRow extends React.Component {
 
     this.handleStartDateChange = this.handleStartDateChange.bind(this);
     this.handleEndDateChange = this.handleEndDateChange.bind(this);
+    // this.onChange = this.onChange.bind(this);
   }
+
+  ///////////////
+
+  // componentDidUpdate(prevProps, prevState) {
+  //   if (this.props.editKey !== this.state.editKey) {
+  //     this.setState({ description: this.props.detailsBeforeEdit.description });
+  //   }
+  // }
+
+  // static getDerivedStateFromProps(props, state) {
+  //   if (props.detailsBeforeEdit.description !== state.description) {
+  //     return {
+  //       startDateSelector: moment(new Date(props.detailsBeforeEdit.startDate)),
+  //       endDateSelector: moment(new Date(props.detailsBeforeEdit.endDate)),
+  //       description: props.detailsBeforeEdit.description,
+  //       amount: props.detailsBeforeEdit.amount,
+  //       frequency: props.detailsBeforeEdit.frequency,
+  //       endDateExists: props.detailsBeforeEdit
+  //         ? props.detailsBeforeEdit.endDateExists
+  //         : false
+  //     };
+  //   }
+  //   // Return null to indicate no change to state.
+  //   else return null;
+  // }
+  ///////////////
+
+  // resetDescription() {
+  //   this.setState({ description: this.props.detailsBeforeEdit.description });
+  // }
+
+  // onChange(e) {
+  //   console.log(e.target.value);
+  //   // console.log(e.target.id : e.target.value);
+  //   this.setState({ description: e.target.value });
+  // }
 
   handleStartDateChange(date) {
     this.setState({
@@ -124,7 +162,12 @@ class EditItemRow extends React.Component {
               <input
                 id={`${this.state.incomeOrExpense}EditItemDescription`}
                 type="text"
-                defaultValue={this.state.description}
+                // name="description"
+                // value={this.state.description}
+                // value={descriptionInput}
+                // value={this.props.detailsBeforeEdit.description}
+                defaultValue={this.props.detailsBeforeEdit.description}
+                // onChange={this.onChange}
                 required="required"
               />
             </div>

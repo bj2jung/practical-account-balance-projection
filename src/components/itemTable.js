@@ -8,17 +8,6 @@ import removeItemButton from "../images/remove_icon.png";
 class ItemTable extends React.Component {
   render() {
     const rows = [];
-    // const mouseOverIndex = this.props.items.findIndex(
-    //   i => i.key === this.props.mouseOverKey
-    // );
-    // let buttons = (
-    //   <div>
-    //     <button onClick={() => this.props.handleEditItem(this.item)}>e</button>
-    //     <button onClick={() => this.props.handleRemoveItem(this.item)}>
-    //       -
-    //     </button>
-    //   </div>
-    // );
 
     if (this.props.items.length > 0) {
       this.props.items.forEach(item => {
@@ -34,23 +23,12 @@ class ItemTable extends React.Component {
       });
     }
 
-    // if (mouseOverIndex >= 0) {
-    //   rows[mouseOverIndex] = (
-    //     <ItemRow
-    //       item={this.props.items[0]}
-    //       key={this.props.items[0].key}
-    //       handleRemoveItem={this.props.handleRemoveItem}
-    //       handleEditItem={this.props.handleEditItem}
-    //       handleMouseOver={this.props.handleMouseOver}
-    //       buttons={buttons}
-    //     />
-    //   );
-    // }
-
     const editIndex = this.props.items.findIndex(
       i => i.key === this.props.editKey
     );
     if (this.props.editKey) {
+      // console.log(this.props.items[editIndex]);
+
       rows[editIndex] = (
         <EditItemRow
           key="editItemRow"
@@ -103,10 +81,9 @@ function ItemRow(props) {
   const startDate = props.item.startDate;
   const endDate = props.item.endDateExists ? props.item.endDate : "-";
   const item = props.item;
-  // const buttons = props.buttons;
 
   return (
-    <tr onMouseOver={() => {}}>
+    <tr>
       <td className="column1">{description}</td>
       <td className="column2">${amount}</td>
       <td className="column3">{frequency}</td>
