@@ -299,7 +299,6 @@ class App extends React.Component {
         accumulatedExpenseArray: accumulatedExpenseArray
       },
       () => {
-        this.updatePieChartInfo();
         localStorage.setItem("state", JSON.stringify(this.state));
       }
     );

@@ -48,7 +48,7 @@ class StartingBalanceBox extends React.Component {
             <div className="centered">
               <div className="group">
                 <input id="optionsAmount" type="text" required="required" />
-                <label>Balance</label>
+                <label for="optionsAmount">Balance</label>
               </div>
             </div>
             <input

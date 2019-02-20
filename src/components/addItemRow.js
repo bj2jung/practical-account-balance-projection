@@ -117,7 +117,9 @@ class AddItemRow extends React.Component {
                 // className="name"
                 required="required"
               />
-              <label>Description</label>
+              <label for={`${this.state.incomeOrExpense}AddItemDescription`}>
+                Description
+              </label>
             </div>
           </div>
         </td>
@@ -128,7 +130,7 @@ class AddItemRow extends React.Component {
               type="text"
               required="required"
             />
-            <label>$</label>
+            <label for={`${this.state.incomeOrExpense}AddItemAmount`}>$</label>
           </div>
         </td>
         <td className="column3 dropDown">
