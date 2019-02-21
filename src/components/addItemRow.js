@@ -20,6 +20,7 @@ class AddItemRow extends React.Component {
       incomeOrExpense: this.props.incomeOrExpense,
       addItemKey: this.props.addItemKey
     };
+
     this.handleStartDateChange = this.handleStartDateChange.bind(this);
     this.handleEndDateChange = this.handleEndDateChange.bind(this);
   }
@@ -36,6 +37,7 @@ class AddItemRow extends React.Component {
     });
   }
 
+  // enable/disable endDateSelector based on endDateExists checkbox. If endDate checkbox is checked, selector is enabled.
   handleEndDateCheckBoxClick() {
     const itemEndDateExists = document.querySelector(
       `#${this.state.incomeOrExpense}AddItemEndDateExists`
@@ -45,6 +47,7 @@ class AddItemRow extends React.Component {
     });
   }
 
+  // enable/disable endDateExists checkbox. If frequency === one-time, checkbox is disabled.
   handleFrequencySelect() {
     const itemFrequency = document.querySelector(
       `#${this.state.incomeOrExpense}AddItemFrequency`
@@ -117,7 +120,9 @@ class AddItemRow extends React.Component {
                 // className="name"
                 required="required"
               />
-              <label for={`${this.state.incomeOrExpense}AddItemDescription`}>
+              <label
+                htmlFor={`${this.state.incomeOrExpense}AddItemDescription`}
+              >
                 Description
               </label>
             </div>
@@ -130,7 +135,9 @@ class AddItemRow extends React.Component {
               type="text"
               required="required"
             />
-            <label for={`${this.state.incomeOrExpense}AddItemAmount`}>$</label>
+            <label htmlFor={`${this.state.incomeOrExpense}AddItemAmount`}>
+              $
+            </label>
           </div>
         </td>
         <td className="column3 dropDown">

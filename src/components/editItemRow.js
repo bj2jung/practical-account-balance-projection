@@ -15,7 +15,6 @@ class EditItemRow extends React.Component {
       description: detailsBeforeEdit.description,
       amount: detailsBeforeEdit.amount,
       frequency: detailsBeforeEdit.frequency,
-      // editKey: this.props.editKey,
       endDateExistsCheckBoxDisabled:
         detailsBeforeEdit.frequency === "One-time" ? true : false,
       endDateExists: detailsBeforeEdit
@@ -31,44 +30,35 @@ class EditItemRow extends React.Component {
 
     this.handleStartDateChange = this.handleStartDateChange.bind(this);
     this.handleEndDateChange = this.handleEndDateChange.bind(this);
-    // this.onChange = this.onChange.bind(this);
+    this.handleConfirmEdit = this.handleConfirmEdit.bind(this);
+    this.handleEndDateCheckBoxClick = this.handleEndDateCheckBoxClick.bind(
+      this
+    );
+    this.handleFrequencySelect = this.handleFrequencySelect.bind(this);
   }
 
-  ///////////////
-
-  // componentDidUpdate(prevProps, prevState) {
-  //   if (this.props.editKey !== this.state.editKey) {
-  //     this.setState({ description: this.props.detailsBeforeEdit.description });
-  //   }
-  // }
-
-  // static getDerivedStateFromProps(props, state) {
-  //   if (props.detailsBeforeEdit.description !== state.description) {
-  //     return {
-  //       startDateSelector: moment(new Date(props.detailsBeforeEdit.startDate)),
-  //       endDateSelector: moment(new Date(props.detailsBeforeEdit.endDate)),
-  //       description: props.detailsBeforeEdit.description,
-  //       amount: props.detailsBeforeEdit.amount,
-  //       frequency: props.detailsBeforeEdit.frequency,
-  //       endDateExists: props.detailsBeforeEdit
-  //         ? props.detailsBeforeEdit.endDateExists
-  //         : false
-  //     };
-  //   }
-  //   // Return null to indicate no change to state.
-  //   else return null;
-  // }
-  ///////////////
-
-  // resetDescription() {
-  //   this.setState({ description: this.props.detailsBeforeEdit.description });
-  // }
-
-  // onChange(e) {
-  //   console.log(e.target.value);
-  //   // console.log(e.target.id : e.target.value);
-  //   this.setState({ description: e.target.value });
-  // }
+  // function that ensures this.state is updated when updated props is passed down from ItemTable component.
+  static getDerivedStateFromProps(props, state) {
+    if (props.detailsBeforeEdit.description !== state.description) {
+      return {
+        startDateSelector: moment(new Date(props.detailsBeforeEdit.startDate)),
+        endDateSelector: moment(new Date(props.detailsBeforeEdit.endDate)),
+        description: props.detailsBeforeEdit.description,
+        amount: props.detailsBeforeEdit.amount,
+        frequency: props.detailsBeforeEdit.frequency,
+        endDateExists: props.detailsBeforeEdit
+          ? props.detailsBeforeEdit.endDateExists
+          : false,
+        endDateExistsCheckBoxDisabled:
+          props.detailsBeforeEdit.frequency === "One-time" ? true : false,
+        endDateSelectorDisabled:
+          props.detailsBeforeEdit.frequency === "One-time" ||
+          !props.detailsBeforeEdit.endDateExists
+            ? true
+            : false
+      };
+    } else return null;
+  }
 
   handleStartDateChange(date) {
     this.setState({
@@ -82,6 +72,7 @@ class EditItemRow extends React.Component {
     });
   }
 
+  // enable/disable endDateSelector based on endDateExists checkbox. If endDate checkbox is checked, selector is enabled.
   handleEndDateCheckBoxClick() {
     const itemEndDateExists = document.querySelector(
       `#${this.state.incomeOrExpense}EditItemEndDateExists`
@@ -97,6 +88,7 @@ class EditItemRow extends React.Component {
     });
   }
 
+  // enable/disable endDateExists checkbox. If frequency === one-time, checkbox is disabled.
   handleFrequencySelect() {
     const itemFrequency = document.querySelector(
       `#${this.state.incomeOrExpense}EditItemFrequency`
@@ -114,6 +106,7 @@ class EditItemRow extends React.Component {
     });
   }
 
+  // function that passes the edited item to App component which updates tables and charts accordingly
   handleConfirmEdit() {
     const itemDescription = document.querySelector(
       `#${this.state.incomeOrExpense}EditItemDescription`
@@ -158,22 +151,17 @@ class EditItemRow extends React.Component {
       <tr className="editItemRow">
         <td className="column1">
           <div className="centered">
-            <div className="group">
+            <div className="group" key={this.props.editKey}>
               <input
                 id={`${this.state.incomeOrExpense}EditItemDescription`}
                 type="text"
-                // name="description"
-                // value={this.state.description}
-                // value={descriptionInput}
-                // value={this.props.detailsBeforeEdit.description}
-                defaultValue={this.props.detailsBeforeEdit.description}
-                // onChange={this.onChange}
+                defaultValue={this.state.description}
                 required="required"
               />
             </div>
           </div>
         </td>
-        <td className="column2">
+        <td className="column2" key={this.props.editKey}>
           <div className="group">
             <input
               id={`${this.state.incomeOrExpense}EditItemAmount`}
@@ -184,12 +172,12 @@ class EditItemRow extends React.Component {
           </div>
         </td>
         <td className="column3 dropDown">
-          <div className="select">
+          <div className="select" key={this.props.editKey}>
             <select
               name="slct"
               className="dropDown"
               id={`${this.state.incomeOrExpense}EditItemFrequency`}
-              onChange={() => this.handleFrequencySelect()}
+              onChange={this.handleFrequencySelect}
               defaultValue={this.state.frequency}
             >
               <option value="One-time">One-time</option>
@@ -211,13 +199,15 @@ class EditItemRow extends React.Component {
           />
         </td>
         <td className="column5">
-          <input
-            id={`${this.state.incomeOrExpense}EditItemEndDateExists`}
-            type="checkbox"
-            onClick={() => this.handleEndDateCheckBoxClick()}
-            disabled={this.state.endDateExistsCheckBoxDisabled}
-            defaultChecked={this.state.endDateExists}
-          />
+          <div key={this.props.editKey}>
+            <input
+              id={`${this.state.incomeOrExpense}EditItemEndDateExists`}
+              type="checkbox"
+              onClick={this.handleEndDateCheckBoxClick}
+              disabled={this.state.endDateExistsCheckBoxDisabled}
+              defaultChecked={this.state.endDateExists}
+            />
+          </div>
         </td>
         <td className="column6">
           <DatePicker
@@ -236,9 +226,7 @@ class EditItemRow extends React.Component {
             type="image"
             alt="confirm"
             src={confirmButton}
-            onClick={() => {
-              this.handleConfirmEdit();
-            }}
+            onClick={this.handleConfirmEdit}
           />
         </td>
       </tr>

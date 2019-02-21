@@ -9,6 +9,7 @@ class ItemTable extends React.Component {
   render() {
     const rows = [];
 
+    // gather items for income and expense tables and add to rows array
     if (this.props.items.length > 0) {
       this.props.items.forEach(item => {
         rows.push(
@@ -17,17 +18,16 @@ class ItemTable extends React.Component {
             key={item.key}
             handleRemoveItem={this.props.handleRemoveItem}
             handleEditItem={this.props.handleEditItem}
-            handleMouseOver={this.props.handleMouseOver}
           />
         );
       });
     }
 
-    const editIndex = this.props.items.findIndex(
-      i => i.key === this.props.editKey
-    );
+    // if there is an item to edit, swap the existing row with EditItemRow component
     if (this.props.editKey) {
-      // console.log(this.props.items[editIndex]);
+      const editIndex = this.props.items.findIndex(
+        i => i.key === this.props.editKey
+      );
 
       rows[editIndex] = (
         <EditItemRow
@@ -40,6 +40,7 @@ class ItemTable extends React.Component {
       );
     }
 
+    // add AddItemRow component to the end of the row array
     rows.push(
       <AddItemRow
         key="addItemRow"

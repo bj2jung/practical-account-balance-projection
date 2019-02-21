@@ -3,7 +3,7 @@ import ReactDOM from "react-dom";
 import "./index.css";
 import { Line, Doughnut } from "react-chartjs-2";
 import "bootstrap/dist/css/bootstrap.min.css";
-import ItemTable from "./components/itemTable.js";
+import ItemTable from "./components/itemTable";
 import StartingBalanceBox from "./components/startingBalanceBox";
 
 class App extends React.Component {
@@ -25,13 +25,13 @@ class App extends React.Component {
       accumulatedIncomeArray: [],
       accumulatedExpenseArray: [],
       chartPeriod: 27,
-      incomeTotal: 0,
-      expenseTotal: 0,
       incomeItemKey: 0,
       expenseItemKey: 0,
       incomeEditKey: null,
       expenseEditKey: null,
-      editItemEndDateExists: null
+      editItemEndDateExists: null,
+      incomeTotalAmount: 0,
+      expenseTotalAmount: 0
     };
   }
 
@@ -106,6 +106,7 @@ class App extends React.Component {
     }
   }
 
+  // function that creates data for pie charts from arrayOfAllItems
   updatePieChartInfo() {
     const incomeChartLabels = [];
     const incomeChartData = [];
@@ -171,20 +172,14 @@ class App extends React.Component {
     };
   }
 
-  calculateTotals(incomeChartData, expenseChartData) {
-    const reducer = (accumulator, currentValue) => accumulator + currentValue;
-    this.setState({
-      incomeTotal: incomeChartData.reduce(reducer, 0),
-      expenseTotal: expenseChartData.reduce(reducer, 0)
-    });
-  }
-
+  // function that changes period of charts (1-year, 2-year, 5-year) based on radio select buttons
   changeChartPeriod(e) {
     this.setState({ chartPeriod: Number(e.target.value) }, () => {
       this.updateLineChartArrays();
     });
   }
 
+  // function that creates data for line chart from accountBalanceArray
   createLineChartData() {
     const lineChartData = this.state.accountBalanceArray.map(x => x.balance);
     const lineChartLabels = this.state.accountBalanceArray.map(x =>
@@ -260,7 +255,8 @@ class App extends React.Component {
     };
   }
 
-  // FUNCTION THAT CREATES AN ARRAY OF GRAPH POINTS, USING arrayOfAllItems & startBalance states
+  // function that creates arrays to be used for line charts using this.state.arrayOfAllItems & this.state.startBalance. Sets state with created arrays
+  // sets accumulated total amounts for income and expense
   updateLineChartArrays() {
     const arrayOfAllItems = this.state.arrayOfAllItems;
     const startBalance = this.state.startBalance;
@@ -292,11 +288,18 @@ class App extends React.Component {
       }
     });
 
+    const incomeTotalAmount =
+      accumulatedIncomeArray[this.state.chartPeriod - 1];
+    const expenseTotalAmount =
+      accumulatedExpenseArray[this.state.chartPeriod - 1];
+
     this.setState(
       {
         accountBalanceArray: accountBalanceArray,
         accumulatedIncomeArray: accumulatedIncomeArray,
-        accumulatedExpenseArray: accumulatedExpenseArray
+        accumulatedExpenseArray: accumulatedExpenseArray,
+        incomeTotalAmount: incomeTotalAmount ? incomeTotalAmount : 0,
+        expenseTotalAmount: expenseTotalAmount ? expenseTotalAmount : 0
       },
       () => {
         localStorage.setItem("state", JSON.stringify(this.state));
@@ -304,7 +307,7 @@ class App extends React.Component {
     );
   }
 
-  // FUNCTION THAT DETERMINES HOW TO UPDATE accountBalanceArray FOR A SINGLE ITEM
+  // function that returns an array from a single item. Array will be used to update accountBalanceArray
   handleItem(item, accountBalanceArray) {
     let interval;
     let amount;
@@ -371,9 +374,7 @@ class App extends React.Component {
     } else {
       if (Date.parse(item.endDate) < firstDayOfChartPeriod) {
         return emptyArray;
-      } else if (
-        lastDayOfChartPeriod < Date.parse(item.endDate) //TODO: this needs to run after a delay (once accountBalanceArray is filled)
-      ) {
+      } else if (lastDayOfChartPeriod < Date.parse(item.endDate)) {
         endDateIndex = this.state.chartPeriod - 1;
       } else {
         endDateIndex = accountBalanceArray.findIndex(
@@ -391,7 +392,7 @@ class App extends React.Component {
     );
   }
 
-  //FUNCTION THAT CREATES AN ARRAY TO BE USED TO UPDATE accountBalanceArray USING PARAMETERS SET IN handleItem
+  // function that creates an array to be used to update accountBalanceArray using parameters set in handleItem()
   createArray(interval, amount, incomeOrExpense, startDateIndex, endDateIndex) {
     const arr = [];
     if (interval === 0) {
@@ -427,7 +428,7 @@ class App extends React.Component {
     return arr;
   }
 
-  // FUNCTION THAT WILL ROUND THE INPUT TIME TO THE NEAREST INTERVAL SET BY createGraphPoints()
+  // function that rounds input date to the nearest interval set by handleSubmitStartingBalance()
   roundToInterval(startDate) {
     const startBalanceDate = Date.parse(this.state.startBalance.startingDate);
     return (
@@ -437,7 +438,7 @@ class App extends React.Component {
     );
   }
 
-  // ADD ADDED ITEM INTO INCOME/EXPENSE TABLES AND CALL FUNCTION THAT UPDATES accountBalanceArray
+  // funtion that adds items to income or expense tables. Sets state. Updates line charts by calling this.updateLineChartArrays()
   handleSubmitItem(item) {
     const inputObject = {
       description: item.description,
@@ -477,7 +478,7 @@ class App extends React.Component {
     localStorage.setItem("state", JSON.stringify(this.state));
   }
 
-  // REMOVE ITEM FROM INCOME/EXPENSE TABLES
+  // function that removes items from tables. Sets state with updated arrays.
   handleRemoveItem(item) {
     const incomeItems = this.state.incomeItems;
     const expenseItems = this.state.expenseItems;
@@ -501,7 +502,7 @@ class App extends React.Component {
     localStorage.setItem("state", JSON.stringify(this.state));
   }
 
-  // HANDLE SUBMISSION OF STARTINGBALANCE
+  // function that handles startingBalance.
   handleSubmitStartingBalance = e => {
     e.preventDefault();
 
@@ -532,14 +533,14 @@ class App extends React.Component {
         accumulatedIncomeArray: [],
         accumulatedExpenseArray: [],
         chartPeriod: 27,
-        incomeTotal: 0,
-        expenseTotal: 0,
         incomeItemKey: 0,
         expenseItemKey: 0,
         incomeEditKey: null,
         expenseEditKey: null,
         editItemEndDateCheckBoxDisabled: null,
-        editItemEndDateExists: null
+        editItemEndDateExists: null,
+        incomeTotalAmount: 0,
+        expenseTotalAmount: 0
       },
       () => {
         this.updateLineChartArrays();
@@ -594,11 +595,7 @@ class App extends React.Component {
                   maintainAspectRatio: false,
                   title: {
                     display: true,
-                    text: `Total Income: $${
-                      this.state.accumulatedIncomeArray[
-                        this.state.chartPeriod - 1
-                      ]
-                    }`,
+                    text: `Total Income: $${this.state.incomeTotalAmount}`,
                     fontSize: 19
                   }
                 }}
@@ -614,8 +611,7 @@ class App extends React.Component {
                   maintainAspectRatio: false,
                   title: {
                     display: true,
-                    text: `Total Expense: $${-this.state
-                      .accumulatedExpenseArray[this.state.chartPeriod - 1]}`,
+                    text: `Total Expense: $${-this.state.expenseTotalAmount}`,
                     fontSize: 19
                   }
                 }}
@@ -643,7 +639,6 @@ class App extends React.Component {
               handleEditItem={this.handleEditItem}
               editKey={this.state.incomeEditKey}
               addEditedItem={this.addEditedItem}
-              handleMouseOver={this.handleMouseOver}
             />
           </div>
           <div className="expenseTable">
@@ -657,7 +652,6 @@ class App extends React.Component {
               handleEditItem={this.handleEditItem}
               editKey={this.state.expenseEditKey}
               addEditedItem={this.addEditedItem}
-              handleMouseOver={this.handleMouseOver}
             />
           </div>
         </div>
